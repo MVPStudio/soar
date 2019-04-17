@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -13,10 +13,16 @@ import EditProject from '../../components/Forms/EditProject';
 import './AddProject.scss';
 
 class AddProject extends Component {
-    submitProject = () => {
-        const values = get(this.props.form, 'values', {});
+    submitProject = (values) => {
         this.props.createProject(values);
     }
+
+    redirectToCreatedProject = () => {
+        const { selectedProject } = this.props;
+        const projectId = get(selectedProject, 'data._id', '');
+
+        return <Redirect to={`/project/${projectId}`} />;
+    };
 
     renderForm() {
         return (
@@ -28,15 +34,8 @@ class AddProject extends Component {
         );
     }
 
-    redirectToCreatedProject = () => {
-        const { selectedProject } = this.props;
-        const projectId = _.get(selectedProject, 'data._id', '');
-
-        return <Redirect to={`/project/${projectId}`} />
-    };
-
     render() {
-        const shouldRedirect = this.props.createProjectStatus === SUCCESS
+        const shouldRedirect = this.props.createProjectStatus === SUCCESS;
 
         if (shouldRedirect) {
             return this.redirectToCreatedProject();
@@ -63,8 +62,8 @@ class AddProject extends Component {
 
 const mapStateToProps = (state) => ({
     events: get(state, 'events', {}),
-    selectedProject: _.get(state, 'projects.selectedProject'),
-    createProjectStatus: _.get(state, 'projects.selectedProject.status.create'),
+    selectedProject: get(state, 'projects.selectedProject'),
+    createProjectStatus: get(state, 'projects.selectedProject.status.create'),
     form: get(state, 'form.EditProject')
 });
 

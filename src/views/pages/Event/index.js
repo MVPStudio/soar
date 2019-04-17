@@ -5,7 +5,7 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import Card from 'react-bootstrap/Card';
-import Alert from 'react-bootstrap/Alert';
+import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Modal from 'react-bootstrap/Modal';
@@ -16,7 +16,7 @@ import { getEventById, updateEvent } from '../../../state/actions/eventActions.j
 import EditEvent from '../../components/Forms/EditEvent';
 
 import Loader from '../../components/Loader';
-import eventImage from '../../../static/imgs/sat-market.jpg';
+// import eventImage from '../../../static/imgs/sat-market.jpg';
 import defaultProfilePic from '../../../static/imgs/default-profile-pic.jpeg';
 
 import './EventPage.scss';
@@ -40,13 +40,13 @@ class EventPage extends Component {
         const isNewDataFinal = this.props.updateEventStatus === SUCCESS;
 
         if (isModalShown && isNewEventData && isNewDataFinal) {
+            // eslint-disable-next-line react/no-did-update-set-state
             this.setState({ showEditModal: false });
         }
     }
 
-    submitEdits = () => {
-        const updates = _.get(this.props.form, 'values', {});
-        this.props.updateEvent(this.props.event._id, updates)
+    submitEdits = (values) => {
+        this.props.updateEvent(this.props.event._id, values);
     };
 
     updateEventAttendance = () => {
@@ -59,16 +59,16 @@ class EventPage extends Component {
     toggleModal = () => {
         this.setState({ 
             showEditModal: !this.state.showEditModal 
-        })
+        });
     }
 
     renderModal() {
         const event = _.mapValues(this.props.event, (value, key) => {
             if (key === 'date') {
-                return moment(value).format('YYYY-MM-DDTHH:mm')
+                return moment(value).format('YYYY-MM-DD');
             }
-            return value
-        })
+            return value;
+        });
 
         return (
             <Modal 
@@ -86,7 +86,7 @@ class EventPage extends Component {
                     />
                 </Modal.Body>
             </Modal>
-        )
+        );
     }
 
     renderHeader(name, project) {
@@ -100,10 +100,10 @@ class EventPage extends Component {
                     Edit event
                 </Button>
                 <Jumbotron className="event-jumbotron">
-                    <h1>{name}</h1>
+                    <h1 style={{ marginBottom: '1rem' }}>{name}</h1>
                     <i>Part of the <Link to={`/project/${project._id}`} style={{ textDecoration: 'underline' }}>{project.name}</Link> project</i>
                 </Jumbotron>
-                <img className="event-image" src={eventImage} alt="event image" />
+                {/* <img className="event-image" src={eventImage} alt="event" /> */}
             </Fragment>
         );
     }
@@ -113,9 +113,30 @@ class EventPage extends Component {
             return (
                 <Card className="event-description-card">
                     <Card.Header>
-                        <h5 style={{ margin: 0 }}>Description</h5>
+                        <b>Event Details</b>
                     </Card.Header>
                     <Card.Body>{description}</Card.Body>
+                </Card>
+            );
+        }
+    }
+
+    renderTags(tags) {
+        if (tags.length > 0) {
+            return (
+                <Card className="event-tags-card">
+                    <Card.Header>
+                        <b>Desired Skills & Interests</b>
+                    </Card.Header>
+                    <Card.Body>
+                        <div className="event-tags">
+                            {_.map(tags, tag => (
+                                <h5 style={{ margin: 0 }}>
+                                    <Badge pill className="tag" variant="success">{tag}</Badge>
+                                </h5>
+                            ))}
+                        </div>
+                    </Card.Body>
                 </Card>
             );
         }
@@ -126,7 +147,7 @@ class EventPage extends Component {
             return (
                 <Card className="event-goals-card">
                     <Card.Header>
-                        <h5 style={{ margin: 0 }}>Goals</h5>
+                        <b>Goals</b>
                     </Card.Header>
                     <Card.Body>
                         <ul>
@@ -144,7 +165,7 @@ class EventPage extends Component {
         return (
             <Card className="attendance-control-card">
                 <Card.Body>
-                    <h5>{isAttending ? 'You\'re going to this event!' : 'Are you going?'}</h5>
+                    <b>{isAttending ? 'You\'re going to this event!' : 'Are you going?'}</b>
                     <Button 
                         variant="outline-success"
                         className="attendance-control-button"
@@ -195,13 +216,13 @@ class EventPage extends Component {
         return (
             <Card className="attendees-card">
                 <Card.Header>
-                    <h5 style={{ margin: 0 }}>{`Attendees (${length})`}</h5>
+                    <b>{`Attendees (${length})`}</b>
                 </Card.Header>
                 <Card.Body>
                     {_.map(attendees, (attendee, i) => (
                         <Fragment key={`attendee-${i}`}>
                             <div className="attendee">
-                                <img src={defaultProfilePic} />
+                                <img src={defaultProfilePic} alt={attendee.name} />
                                 <div>{attendee.name}</div>
                             </div>
                             <hr />
@@ -215,7 +236,7 @@ class EventPage extends Component {
     render() {
         const { event, userId, getEventStatus } = this.props;
 
-        if (getEventStatus !== SUCCESS) return <Loader />
+        if (getEventStatus !== SUCCESS) return <Loader />;
 
         const { 
             name, 
@@ -227,7 +248,8 @@ class EventPage extends Component {
             attendeeIds, 
             attendees, 
             project, 
-            goals 
+            goals,
+            tags
         } = event;
 
         const isAttending = _.includes(attendeeIds, userId);
@@ -239,6 +261,7 @@ class EventPage extends Component {
                     <div className="main">
                         {this.renderHeader(name, project)}
                         {this.renderDescription(description)}
+                        {this.renderTags(tags)}
                         {this.renderGoals(goals)}
                     </div>
                     <div className="side">

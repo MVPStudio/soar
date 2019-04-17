@@ -3,6 +3,7 @@
         border-radius: 0;
         border-top-right-radius: 0.3rem;
         border-bottom-left-radius: 0.3rem;
+        border: 1px solid rgba(0,0,0,.125);
         float: right;
     }
     .project-jumbotron {
@@ -140,10 +141,20 @@
         }
 
         .event-card-body {
-            margin-bottom: 1rem;
-
             .event-view-button {
                 margin-top: 1rem;
+            }
+        }
+    }
+    .project-tags-card {
+        margin-bottom: 2rem;
+
+        .project-tags {
+            display: flex;
+            flex-flow: row wrap;
+    
+            .tag {
+                margin: 0 0.75rem 0.75rem 0;
             }
         }
     }

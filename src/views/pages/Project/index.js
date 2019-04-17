@@ -9,6 +9,7 @@ import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Modal from 'react-bootstrap/Modal';
+import Badge from 'react-bootstrap/Badge';
 
 import { getProjectById, updateProject } from '../../../state/actions/projectActions';
 import { getOrganizationById } from '../../../state/actions/organizationActions';
@@ -17,7 +18,6 @@ import { NOT_STARTED, SUCCESS } from '../../../state/statusTypes';
 
 import Loader from '../../components/Loader';
 import EditProject from '../../components/Forms/EditProject';
-import parkImg from '../../../static/imgs/food.jpg';
 
 import './ProjectPage.scss';
 
@@ -25,7 +25,6 @@ class Project extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filteredEvents: props.events,
             showEditModal: false
         };
     }
@@ -35,12 +34,13 @@ class Project extends Component {
         this.props.getProjectById(projectID);
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps) {
         const isModalShown = this.state.showEditModal;
         const isNewProjectData = prevProps.project !== this.props.project;
         const isNewDataFinal = this.props.updateProjectStatus === SUCCESS;
 
         if (isModalShown && isNewProjectData && isNewDataFinal) {
+            // eslint-disable-next-line react/no-did-update-set-state
             this.setState({ showEditModal: false });
         }
 
@@ -49,28 +49,27 @@ class Project extends Component {
             && !_.isEmpty(this.props.project.eventIds) 
             && this.props.eventsByIdStatus !== SUCCESS
         ) {
-            this.props.getEventsById(this.props.project.eventIds)
+            this.props.getEventsById(this.props.project.eventIds);
         }
     }
 
-    submitEdits = () => {
-        const updates = _.get(this.props.form, 'values', {});
+    submitEdits = (updates) => {
         this.props.updateProject(this.props.project._id, updates);
     };
 
     toggleModal = () => {
         this.setState({ 
             showEditModal: !this.state.showEditModal 
-        })
+        });
     }
 
     renderModal() {
         const project = _.mapValues(this.props.project, (value, key) => {
-            if (key === 'startDate' || key === 'endDate') {
-                return moment(value).format('YYYY-MM-DD')
+            if (key === 'completedAt' || key === 'completedAtExpected') {
+                return moment(value).format('YYYY-MM-DD');
             }
-            return value
-        })
+            return value;
+        });
 
         return (
             <Modal 
@@ -91,7 +90,7 @@ class Project extends Component {
         );
     }
 
-    renderHeader(name, organization, description) {
+    renderHeader(name, organization, description, completedAtExpected, status) {
         const { name: orgName, _id: orgId } = organization;
 
         return (
@@ -104,16 +103,38 @@ class Project extends Component {
                     Edit project
                 </Button>
                 <Jumbotron className="project-jumbotron">
-                    <h1>{name}</h1>
-                    <i>Project led by <Link to={`/organization/${orgId}`} style={{ textDecoration: 'underline' }}>{orgName}</Link></i>
-                    { description &&
+                    <h1 style={{ marginBottom: '1rem' }}>{name}</h1>
+                    {
+                        status &&
+                        <Fragment>
+                            <b>Status:</b> <i>{status}</i>
+                        </Fragment>
+                    }
+                    {
+                        completedAtExpected && 
+                        <Fragment>
+                            <br />
+                            <b>Expected completion:</b> <i>{moment(completedAtExpected).format('MMMM D, YYYY')}</i>
+                            <br />
+                        </Fragment>
+                    }
+                    <Fragment>
+                        <b>Project led by: </b> 
+                        <i>
+                            <Link to={`/organization/${orgId}`} style={{ textDecoration: 'underline' }}>
+                                {orgName}
+                            </Link>
+                        </i>
+                    </Fragment>
+                    { 
+                        description &&
                         <Fragment>
                             <hr />
                             <p style={{ margin: 0 }}>{description}</p>
                         </Fragment>
                     }
                 </Jumbotron>
-                <img className="project-image" src={parkImg} alt="project image" />
+                {/* <img className="project-image" src={parkImg} alt="project" /> */}
             </Fragment>
         );
     }
@@ -124,7 +145,7 @@ class Project extends Component {
                 <Card className="events-card">
                     <Card.Header>
                         <div className="header">
-                            <h5 style={{ margin: 0 }}>Our Journey</h5>
+                            <b>Events in this Project</b>
                             <div>
                                 <span><i className="fas fa-circle" />Past</span>
                                 <span><i className="fas fa-adjust" />Today</span>
@@ -194,7 +215,7 @@ class Project extends Component {
     }
 
     renderEventDescription(event, index) {
-        const { name, _id, description, eventDate } = event;
+        const { name, _id, description } = event;
 
         return (
             <Card key={index} className="event-description">
@@ -202,12 +223,12 @@ class Project extends Component {
                     <div className="top">
                         <Card.Title>{name}</Card.Title>
                         <Card.Text>
-                            {_.truncate(description, { 'length': 150 })}
+                            {_.truncate(description, { length: 150 })}
                         </Card.Text>
                     </div>
                     <Link to={`/event/${_id}`}>
                         <Button 
-                            variant="success"
+                            variant="outline-success"
                             className="event-view-button"
                         >
                             View
@@ -218,12 +239,33 @@ class Project extends Component {
         );
     }
 
+    renderTags(tags) {
+        if (tags.length > 0) {
+            return (
+                <Card className="project-tags-card">
+                    <Card.Header>
+                        <b>Desired Skills & Interests</b>
+                    </Card.Header>
+                    <Card.Body>
+                        <div className="project-tags">
+                            {_.map(tags, tag => (
+                                <h5 style={{ margin: 0 }}>
+                                    <Badge pill className="tag" variant="success">{tag}</Badge>
+                                </h5>
+                            ))}
+                        </div>
+                    </Card.Body>
+                </Card>
+            );
+        }
+    }
+
     renderAlliance(alliance) {
         if (alliance && alliance.length) {
             return (
                 <Card className="alliance-card">
                     <Card.Header>
-                        <h5 style={{ margin: 0 }}>Alliance</h5>
+                        <b>Alliance</b>
                     </Card.Header>
                     <Card.Body className="alliance-card-body">
                         {_.map(alliance, (org, index) => this.renderOrganizationCard(org, index))}
@@ -238,12 +280,11 @@ class Project extends Component {
 
         return (
             <Card key={index} className="organization-card">
-                {/* <Card.Img variant="top" src="holder.js/100px180" /> */}
                 <Card.Body className="organization-card-body">
                     <div className="top">
                         <Card.Title>{name}</Card.Title>
                         <Card.Text>
-                            {_.truncate(tagline, { 'length': 150 })}
+                            {_.truncate(tagline, { length: 150 })}
                         </Card.Text>
                     </div>
                     <Link to={`/organization/${_id}`}>
@@ -260,24 +301,35 @@ class Project extends Component {
     }
 
     render() {
-        const { project, organization, getProjectStatus, eventsById } = this.props;
+        const { 
+            project, 
+            organization, 
+            getProjectStatus, 
+            eventsById 
+        } = this.props;
+
+        if (getProjectStatus !== SUCCESS) return <Loader />;
 
         const {
             name,
             description,
-            alliance_data: alliance
+            alliance_data: alliance,
+            tags,
+            completedAtExpected,
+            status
         } = project;
 
-        if (getProjectStatus !== SUCCESS) return <Loader />;
+        const eventsDescending = _.reverse(_.sortBy(eventsById, 'date'));
 
         return (
             <div className="project-page">
                 {this.renderModal()}
-                {this.renderHeader(name, organization, description)}
-                {this.renderEvents(eventsById)}
+                {this.renderHeader(name, organization, description, completedAtExpected, status)}
+                {this.renderEvents(eventsDescending)}
+                {this.renderTags(tags)}
                 {this.renderAlliance(alliance)}
             </div>
-        )
+        );
     }
 }
 

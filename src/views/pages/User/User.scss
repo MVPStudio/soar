@@ -30,6 +30,19 @@
             .contact {
                 margin-bottom: 2rem;
             }
+
+            .user-tags-card {
+                margin-bottom: 2rem;
+        
+                .user-tags {
+                    display: flex;
+                    flex-flow: row wrap;
+            
+                    .tag {
+                        margin: 0 0.75rem 0.75rem 0;
+                    }
+                }
+            }
         }
         .main {
             flex: 2;
