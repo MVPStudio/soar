@@ -1,0 +1,14 @@
+.add-user-page {
+    display: flex;
+    flex-flow: column nowrap;
+    margin: auto;
+    max-width: 600px;
+
+    .add-user-header {
+        margin-bottom: 1rem;
+
+        h2 {
+            margin: 0;
+        }
+    }
+}

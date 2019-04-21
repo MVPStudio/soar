@@ -1,0 +1,83 @@
+.event-page {
+    display: flex;
+    flex-flow: row nowrap;
+
+    .edit-event-button {
+        border-radius: 0;
+        border-top-right-radius: 0.3rem;
+        border-bottom-left-radius: 0.3rem;
+        float: right;
+    }
+
+    .main {
+        flex: 2;
+        margin-right: 2rem;
+
+        .event-jumbotron {
+            padding: 2rem;
+        }
+        .event-image {
+            width: 100%;
+            border-radius: 0.3rem;
+            margin-bottom: 2rem;
+        }
+        .event-description-card {
+            margin-bottom: 2rem;
+        }
+        .event-goals-card {
+            ul {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .side {
+        flex: 1;
+
+        .attendance-control-card {
+            margin-bottom: 2rem;
+
+            .attendance-control-button {
+                width: 100%;
+                margin-top: 1rem;
+            }
+        }
+        .date-location-card {
+            margin-bottom: 2rem;
+
+            i {
+                color: #74b077;
+                margin-right: 1rem;
+            }
+
+            .event-address {
+                display: flex;
+                flex-flow: row nowrap;
+                
+                i {
+                    padding-left: 0.1rem;
+                    padding-top: 0.3rem;
+                }
+            }
+        }
+        .attendees-card {
+            .attendee {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+
+                img {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                    margin-right: 1rem;
+                    border-radius: 50%;
+                }
+            }
+            hr {
+                &:last-of-type {
+                    display: none;
+                }
+            }
+        }
+    }
+}
