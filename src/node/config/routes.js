@@ -70,5 +70,5 @@ const endpoints = {
 };
 
 module.exports = _.mapValues(endpoints, 
-    endpointURL => `${endpointURL}`
+    endpointURL => `/api${endpointURL}`
 );

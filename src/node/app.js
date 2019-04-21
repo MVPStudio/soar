@@ -4,7 +4,10 @@ const app = express();
 const port = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const path = require('path');
 const { authenticate } = require('./middleware/ecan-passport-strategy');
+
+const publicDirectory = path.join(__dirname, '..', 'public');
 
 /*
     Import DB Collection Models
@@ -54,6 +57,13 @@ require('./routes/eventRoutes')(app);
 require('./routes/userRoutes')(app);
 
 app.get('/health', (req, res) => res.status(200).send({ msg: 'Active' }));
+
+app.use(express.static(publicDirectory));
+app.get('*', (req, res) =>
+    res
+    .type('html')
+    .sendFile(path.join(publicDirectory, 'index.html'))
+);
 
 app.listen(port, () => console.log(`ECAN server started on: ${port}`));
 
