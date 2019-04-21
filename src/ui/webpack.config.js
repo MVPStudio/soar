@@ -57,6 +57,9 @@ module.exports = {
         hot: true,
         inline: true,
         historyApiFallback: true,
+        proxy: {
+            '/api': 'http://localhost:3000'
+        }
     }
 };
 
@@ -74,5 +77,5 @@ if (!process.env.CONFIG_ENV) {
             `       WARNING: You did not specify a CONFIG_ENV in your start command, 
                              default is local you will need to run the service locally from the '/node' directory
         `)
-    )
+    );
 }
