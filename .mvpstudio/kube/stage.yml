@@ -52,7 +52,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ecan-soar
+  name: ecan-soar-web
   namespace: ecan-soar
   annotations:
     getambassador.io/config: |
@@ -62,14 +62,21 @@ metadata:
       name: ecan-soar-mapping
       host: soar.stage.apps.mvpstudio.org
       prefix: /
-      service: ecan-soar.ecan-soar
+      service: ecan-soar-web.ecan-soar
+      ---
+      apiVersion: ambassador/v0
+      kind: TLSContext
+      name: stage-ecan-soar-tls
+      hosts:
+      - soar.stage.apps.mvpstudio.org
+      secret: stage-apps-cert
 spec:
   selector:
      app: ecan-soar
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 8080
+    targetPort: 3000
 ---
 apiVersion: v1
 kind: Service
