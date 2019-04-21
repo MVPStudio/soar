@@ -19,16 +19,21 @@ require('./models/userModel');
 
 // mongoose connection
 mongoose.Promise = global.Promise;
-// const ecanDB = 'mongodb://www.ecan-db.hnavarro-api.com/ECANdb';
 
-mongoose.connect('mongodb://127.0.0.1:27017')
-// mongoose.connect(ecanDB)
-//     .then(client => { console.log('Connected to ECANdb'); })
-//     .catch(err => {
-//         console.error(`Unable to connect to ECANdb. Check if MongoDB instance is running
-// 					   Run mongodb instance in another terminal using: mongod
-//                        ${err.stack || err }`);
-//     });
+const ecanDB = process.env.DATABASE_HOST;
+const username = process.env.DATABASE_USERNAME;
+const password = process.env.DATABASE_PASSWORD;
+
+const hasAuth = username != null;
+const authStr = hasAuth ? `${username}:${password}@` : '';
+
+mongoose.connect(`mongodb://${authStr}${ecanDB}`)
+    .then(client => { console.log('Connected to ECANdb'); })
+    .catch(err => {
+        console.error(`Unable to connect to ECANdb. Check if MongoDB instance is running
+					   Run mongodb instance in another terminal using: mongod
+                       ${err.stack || err}`);
+    });
 
 //Initialize and use the passport JWT strategy
 app.use(passport.initialize());
@@ -56,7 +61,7 @@ require('./routes/projectRoutes')(app);
 require('./routes/eventRoutes')(app);
 require('./routes/userRoutes')(app);
 
-app.get('/health', (req, res) => res.status(200).send({ msg: 'Active' }));
+app.get('/api/health', (req, res) => res.status(200).send({ msg: 'Active' }));
 
 app.use(express.static(publicDirectory));
 app.get('*', (req, res) =>
