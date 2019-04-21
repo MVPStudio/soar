@@ -1,11 +1,11 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const colors = require('colors');
-const Router = require('./src/config/routes');
+const Router = require('./config/routes');
 
 module.exports = {
     entry: [
-        path.resolve(__dirname, 'src/index.js')
+        path.resolve(__dirname, 'index.js')
     ],
     output: {
         filename: '[name].bundle.js',
@@ -43,7 +43,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'index.html',
+            template: path.resolve(__dirname, 'index.html'),
             envConfig: process.env.CONFIG_ENV
         })
     ],

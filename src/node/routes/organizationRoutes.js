@@ -1,5 +1,5 @@
 const {getAll, getByID, getMultipleByID, createOrUpdate, deleteOrganization} = require('../services/organizationService');
-const routes = require('../config/routes.js');
+const routes = require('../config/routes');
 const { authenticate } = require('../middleware/ecan-passport-strategy');
 
 const sendPromise = (req, res, promise) => {

@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import Loader from '../../components/Loader';
+import Loader from '../Loader';
 
 import { getProjects } from '../../../state/actions/projectActions';
 import { SUCCESS } from '../../../state/statusTypes';

@@ -1,4 +1,4 @@
-const routes = require('../config/routes.js');
+const routes = require('../config/routes');
 const { getAll, getByID, getMultipleById, createOrUpdate, deleteProject } = require('../services/projectService');
 const { authenticate } = require('../middleware/ecan-passport-strategy');
 const { roleValidation } = require('../lib/roles');
