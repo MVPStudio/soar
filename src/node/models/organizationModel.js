@@ -52,7 +52,7 @@ const OrganizationSchema = new Schema({
     memberIds: {
         type: [String]
     },
-    skills: {
+    tags: {
         type: [String],
         default: []
     },
