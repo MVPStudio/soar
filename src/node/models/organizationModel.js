@@ -1,11 +1,21 @@
 const mongoose = require('mongoose');
-const ObjectId = require('mongodb').ObjectId;
+
 const Schema = mongoose.Schema;
 
 const OrganizationSchema = new Schema({
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date
+    },
     name: {
         type: String,
         required: 'Please enter the organization name'
+    },
+    category: {
+        type: String,
+        default: 'Miscellaneous'
     },
     address: {
         street: {
@@ -32,43 +42,30 @@ const OrganizationSchema = new Schema({
     website: {
         type: String
     },
-    tagline: {
-        type: String
-    },
     description: {
         type: String
     },
-    created_at: {
-        type: Date
-    },
-    deleted_at: {
-        type: Date,
-        default: null
-    },
     projectIds: {
-        type: [String],
-        default: []
-    },
-    projects: {
-        type: [Object],
-        default: []
-    },
-    tags: {
         type: [String],
         default: []
     },
     memberIds: {
         type: [String]
     },
-    // members: {
-    //     type: [Object]
-    // },
+    tags: {
+        type: [String],
+        default: []
+    },
+    interests: {
+        type: [String],
+        default: []
+    },
 });
 
 OrganizationSchema.statics.getById = function (organizationId) {
     return this.findOne({ _id: organizationId })
         .then(res => res)
-        .catch(err => err)
+        .catch(err => err);
 };
 
 module.exports = mongoose.model('OrganizationModel', OrganizationSchema);

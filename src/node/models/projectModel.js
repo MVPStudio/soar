@@ -1,14 +1,30 @@
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
-const Schema = mongoose.Schema;
 const _ = require('lodash');
-
 const OrganizationModel = require('./organizationModel');
 
+const Schema = mongoose.Schema;
+
 const ProjectSchema = new Schema({
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date
+    },
+    completedAt: {
+        type: Date
+    },
+    completedAtExpected: {
+        type: Date
+    },
     name: {
         type: String,
         required: 'Please enter the project name'
+    },
+    status: {
+        type: String,
+        default: 'Ongoing'
     },
     description: {
         type: String
@@ -26,7 +42,8 @@ const ProjectSchema = new Schema({
         default: []
     },
     tags: {
-        type: [String]
+        type: [String],
+        default: []
     },
     eventIds: {
         type: [Schema.Types.ObjectId]

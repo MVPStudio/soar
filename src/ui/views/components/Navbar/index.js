@@ -16,16 +16,16 @@ class Navbar extends Component {
         return (
             <NavDropdown title="Explore">
                 <NavDropdown.Item>
-                    <Link to='/explore#events'>Events</Link>
+                    <Link to="/explore#events">Events</Link>
                 </NavDropdown.Item>
                 <NavDropdown.Item>
-                    <Link to='/explore#projects'>Projects</Link>
+                    <Link to="/explore#projects">Projects</Link>
                 </NavDropdown.Item>
                 <NavDropdown.Item>
-                    <Link to='/explore#organizations'>Organizations</Link>
+                    <Link to="/explore#organizations">Organizations</Link>
                 </NavDropdown.Item>
             </NavDropdown>
-        )
+        );
     }
 
     renderProfileNewUser() {
@@ -56,7 +56,7 @@ class Navbar extends Component {
         return (
             <BootNavbar collapseOnSelect expand="md" bg="light" variant="light">
                 <Container>
-                    <Link to='/'>
+                    <Link to="/">
                         <i className="fas fa-leaf" />
                         <BootNavbar.Brand>SOAR Network</BootNavbar.Brand>
                     </Link>

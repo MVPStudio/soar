@@ -57,6 +57,18 @@
                     }
                 }
             }
+            .org-tags-card {
+                margin-bottom: 2rem;
+        
+                .project-tags {
+                    display: flex;
+                    flex-flow: row wrap;
+            
+                    .tag {
+                        margin: 0 0.75rem 0.75rem 0;
+                    }
+                }
+            }
         }
     
         .main {

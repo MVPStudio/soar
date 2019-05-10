@@ -1,7 +1,7 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
-import { get, cloneDeep } from 'lodash';
+import get from 'lodash/get';
 
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -13,10 +13,16 @@ import EditOrganization from '../../components/Forms/EditOrganization';
 import './AddOrganization.scss';
 
 class AddOrganization extends Component {
-    submitOrganization = () => {
-        const values = get(this.props.form, 'values', {});
+    submitOrganization = (values) => {
         this.props.addOrganization(values);
     }
+
+    redirectToCreatedOrg = () => {
+        const { selectedOrganization } = this.props;
+        const organizationId = get(selectedOrganization, 'data._id', '');
+
+        return <Redirect to={`/organization/${organizationId}`} />;
+    };
 
     renderForm() {
         return (
@@ -28,15 +34,8 @@ class AddOrganization extends Component {
         );
     }
 
-    redirectToCreatedOrg = () => {
-        const { selectedOrganization } = this.props;
-        const organizationId = _.get(selectedOrganization, 'data._id', '');
-
-        return <Redirect to={`/organization/${organizationId}`} />
-    };
-
     render() {
-        const shouldRedirect = this.props.createOrganizationStatus === SUCCESS
+        const shouldRedirect = this.props.createOrganizationStatus === SUCCESS;
 
         if (shouldRedirect) {
             return this.redirectToCreatedOrg();
@@ -62,10 +61,10 @@ class AddOrganization extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    organizations: _.get(state, 'organizations.data'),
-    organizationStatus: _.get(state, 'organizations.status'),
-    selectedOrganization: _.get(state, 'organizations.selectedOrg'),
-    createOrganizationStatus: _.get(state, 'organizations.selectedOrg.status.create'),
+    organizations: get(state, 'organizations.data'),
+    organizationStatus: get(state, 'organizations.status'),
+    selectedOrganization: get(state, 'organizations.selectedOrg'),
+    createOrganizationStatus: get(state, 'organizations.selectedOrg.status.create'),
     form: get(state, 'form.EditOrganization')
 });
 

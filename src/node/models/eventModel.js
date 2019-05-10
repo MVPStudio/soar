@@ -1,9 +1,16 @@
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 const _ = require('lodash');
+
 const Schema = mongoose.Schema;
 
 const EventSchema = new Schema({
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date
+    },
     name: {
         type: String,
         required: 'Please enter the event name'
@@ -46,7 +53,8 @@ const EventSchema = new Schema({
         type: [String]
     },
     tags: {
-        type: [String]
+        type: [String],
+        default: []
     },
     goals: {
         type: [String]

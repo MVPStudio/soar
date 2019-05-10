@@ -46,6 +46,15 @@
         .feed {
             .card {
                 margin-bottom: 2rem;
+
+                .feed-tags {
+                    display: flex;
+                    flex-flow: row wrap;
+
+                    .tag {
+                        margin-right: 0.5rem;
+                    }
+                }
             }
         }
     }

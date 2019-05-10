@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -13,10 +13,16 @@ import { SUCCESS } from '../../../state/statusTypes';
 import './AddEvent.scss';
 
 class AddEvent extends Component {
-    submitEvent = () => {
-        const values = get(this.props.form, 'values', {});
+    submitEvent = (values) => {
         this.props.createEvent(values);
     }
+
+    redirectToCreatedEvent = () => {
+        const { selectedEvent } = this.props;
+        const eventId = get(selectedEvent, 'data.data._id', '');
+
+        return <Redirect to={`/event/${eventId}`} />;
+    };
 
     renderForm() {
         return (
@@ -28,15 +34,8 @@ class AddEvent extends Component {
         );
     }
 
-    redirectToCreatedEvent = () => {
-        const { selectedEvent } = this.props;
-        const eventId = _.get(selectedEvent, 'data.data._id', '');
-
-        return <Redirect to={`/event/${eventId}`} />
-    };
-
     render() {
-        const shouldRedirect = this.props.createEventStatus === SUCCESS
+        const shouldRedirect = this.props.createEventStatus === SUCCESS;
 
         if (shouldRedirect) {
             return this.redirectToCreatedEvent();
@@ -63,8 +62,8 @@ class AddEvent extends Component {
 
 const mapStateToProps = (state) => ({
     events: get(state, 'events', {}),
-    selectedEvent: _.get(state, 'events.selectedEvent'),
-    createEventStatus: _.get(state, 'events.selectedEvent.status.create'),
+    selectedEvent: get(state, 'events.selectedEvent'),
+    createEventStatus: get(state, 'events.selectedEvent.status.create'),
     form: get(state, 'form.EditEvent')
   });
 

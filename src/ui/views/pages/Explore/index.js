@@ -32,7 +32,7 @@ class Explore extends Component {
 
         this.state = {
             category
-        }
+        };
     }
     
     componentDidUpdate(prevProps) {
@@ -42,13 +42,15 @@ class Explore extends Component {
                 : this.state.category;
 
             if (category !== this.state.category) {
-                this.setState({ category })
+                // eslint-disable-next-line react/no-did-update-set-state
+                this.setState({ category });
             }
         }
     }
 
     renderAddButton() {
-        let link, text;
+        let link;
+        let text;
 
         switch (this.state.category) {
             case 'events':
@@ -160,17 +162,17 @@ class Explore extends Component {
                     </Dropdown.Menu>
                 </Dropdown>
             </div>
-        )
+        );
     }
 
     renderFeed() {
         switch (this.state.category) {
             case 'events':
-                return <EventFeed />
+                return <EventFeed />;
             case 'projects':
-                return <ProjectFeed />
+                return <ProjectFeed />;
             case 'organizations':
-                return <OrganizationFeed />
+                return <OrganizationFeed />;
             default:
                 break;
         }
