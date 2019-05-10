@@ -21,7 +21,7 @@
         "babel": "^6.23.0",
         "babel-eslint": "^8.2.6",
         "babel-polyfill": "^6.26.0",
-        "bcrypt": "^3.0.1",
+        "bcrypt": "^3.0.6",
         "body-parser": "^1.18.3",
         "bootstrap": "^4.2.1",
         "classnames": "^2.2.5",

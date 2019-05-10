@@ -7,25 +7,55 @@ import _ from 'lodash';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
-import Badge from 'react-bootstrap/Badge';
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 
 import { Input, TextArea, Select, List } from './utils/FormFields';
-import { StateSelect } from './utils/StateSelect';
+import { StateSelect } from './utils/ValueSelects';
 import { getProjects } from '../../../state/actions/projectActions';
 import { SUCCESS, ERROR } from '../../../state/statusTypes';
 
 Object.assign(Validators.defaultOptions, {
     allowBlank: true
-})
+});
 
 class EditEvent extends Component {
-    state = {
-        tags: [],
-        tagToAdd: ''
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            tags: _.get(props, 'initialValues.tags', []),
+            tagToAdd: ''
+        };
+
+        props.getProjects();
     }
 
-    componentDidMount() {
-        this.props.getProjects();
+    addTag = () => {
+        const { tags, tagToAdd } = this.state;
+        const shouldAddTag = tagToAdd.trim() !== '' && !tags.includes(tagToAdd);
+
+        if (shouldAddTag) {
+            const newTags = tags;
+            newTags.push(tagToAdd);
+    
+            this.setState({ 
+                tags: newTags,
+                tagToAdd: ''
+            });
+        }
+    }
+
+    removeTag = tagToDelete => {
+        const { tags } = this.state;
+        const newTags = tags.filter(tag => tag !== tagToDelete);
+
+        this.setState({ tags: newTags });
+    }
+
+    submitWithTags = (values, dispatch, props) => {
+        const valuesWithTags = { ...values, tags: this.state.tags };
+        props.onSubmit(valuesWithTags);
     }
 
     showError() {
@@ -42,167 +72,126 @@ class EditEvent extends Component {
         }
     }
 
-    addTag = () => {
-        const { tags, tagToAdd } = this.state;
-
-        if (tagToAdd.trim() !== '' && !tags.includes(tagToAdd)) {
-            const newTags = tags;
-            newTags.push(tagToAdd);
-    
-            this.setState({ 
-                tags: newTags,
-                tagToAdd: ''
-            })
-        }
-    }
-
-    removeTag = tagToDelete => {
-        const { tags } = this.state;
-        const newTags = tags.filter(tag => tag !== tagToDelete)
-
-        this.setState({ tags: newTags });
-    }
-
     render() {
         if (this.props.projectStatus !== SUCCESS) return <div>Loading...</div>;
 
         return (
-            <Form onSubmit={this.props.handleSubmit}>
-                <Field
-                    label="Name*"
-                    name="name"
-                    component={Input}
-                    type="text"
-                    validate={required()}
-                />
-                <Field
-                    label="Project*"
-                    name="projectId"
-                    component={Select}
-                    validate={required()}
-                >
-                    <option>Project...</option>
-                    {_.map(this.props.projects, project => (
-                        <option value={project._id} key={project._id}>{project.name}</option>
-                    ))}
-                </Field>
-                <div className="related-fields-container">
-                    <Form.Row>
-                        <Col>
+            <Form onSubmit={this.props.handleSubmit(this.submitWithTags)}>
+                <Tabs>
+                    <Tab title="The Basics" eventKey="basicInfo">
+                        <Field
+                            label="Name*"
+                            name="name"
+                            component={Input}
+                            type="text"
+                            validate={required()}
+                        />
+                        <Field
+                            label="Project*"
+                            name="projectId"
+                            component={Select}
+                            validate={required()}
+                        >
+                            <option>Project...</option>
+                            {_.map(this.props.projects, project => (
+                                <option value={project._id} key={project._id}>{project.name}</option>
+                            ))}
+                        </Field>
+                    </Tab>
+                    <Tab title="When & Where" eventKey="whenWhere">
+                        <div className="related-fields-container">
+                            <Form.Row>
+                                <Col>
+                                    <Field
+                                        label="Date*"
+                                        name="date"
+                                        component={Input}
+                                        type="date"
+                                        validate={required()}
+                                    />
+                                </Col>
+                                <Col>
+                                    <Field
+                                        label="Start time*"
+                                        name="startTime"
+                                        component={Input}
+                                        type="time"
+                                        validate={required()}
+                                    />
+                                </Col>
+                                <Col>
+                                    <Field
+                                        label="End time"
+                                        name="endTime"
+                                        component={Input}
+                                        type="time"
+                                    />
+                                </Col>
+                            </Form.Row>
+                        </div>
+                        <div className="related-fields-container">
                             <Field
-                                label="Date*"
-                                name="date"
-                                component={Input}
-                                type="date"
-                                validate={required()}
-                            />
-                        </Col>
-                        <Col>
-                            <Field
-                                label="Start time*"
-                                name="startTime"
-                                component={Input}
-                                type="time"
-                                validate={required()}
-                            />
-                        </Col>
-                        <Col>
-                            <Field
-                                label="End time"
-                                name="endTime"
-                                component={Input}
-                                type="time"
-                            />
-                        </Col>
-                    </Form.Row>
-                </div>
-                <div className="related-fields-container">
-                    <Field
-                        label="Street Address*"
-                        name="address.street"
-                        component={Input}
-                        type="text"
-                        validate={required()}
-                    />
-                    <Form.Row>
-                        <Col>
-                            <Field
-                                label="City*"
-                                name="address.city"
+                                label="Street Address*"
+                                name="address.street"
                                 component={Input}
                                 type="text"
                                 validate={required()}
                             />
-                        </Col>
-                        <Col>
-                            <Field
-                                label="State*"
-                                name="address.state"
-                                component={Select}
-                                validate={required()}
-                            >
-                                <option>Choose...</option>
-                                <StateSelect />
-                            </Field>
-                        </Col>
-                        <Col>
-                            <Field
-                                label="Zip code*"
-                                name="address.zipCode"
-                                component={Input}
-                                type="number"
-                                validate={required()}
-                            />  
-                        </Col>
-                    </Form.Row>
-                </div>
-                <Field
-                    label="Description"
-                    name="description"
-                    component={TextArea}
-                    type="text"
-                    rows={3}
-                />
-                {/* <Field
-                    label="Tags"
-                    name="tags"
-                    component={List}
-                    type="text"
-                    normalize={value => value.split(',')}
-                /> */}
-                {/* <Form.Group>
-                    <Form.Label>tags</Form.Label>
-                    <div style={{ display: 'flex', flexFlow: 'row nowrap' }}>
-                        <Form.Control 
+                            <Form.Row>
+                                <Col>
+                                    <Field
+                                        label="City*"
+                                        name="address.city"
+                                        component={Input}
+                                        type="text"
+                                        validate={required()}
+                                    />
+                                </Col>
+                                <Col>
+                                    <Field
+                                        label="State*"
+                                        name="address.state"
+                                        component={Select}
+                                        validate={required()}
+                                    >
+                                        <option>Choose...</option>
+                                        <StateSelect />
+                                    </Field>
+                                </Col>
+                                <Col>
+                                    <Field
+                                        label="Zip code*"
+                                        name="address.zipCode"
+                                        component={Input}
+                                        type="number"
+                                        validate={required()}
+                                    />  
+                                </Col>
+                            </Form.Row>
+                        </div>
+                    </Tab>
+                    <Tab title="About the Event" eventKey="aboutEvent">
+                        <Field
+                            label="Description"
+                            name="description"
+                            component={TextArea}
                             type="text"
-                            onChange={e => this.setState({ tagToAdd: e.target.value })} 
-                            value={this.state.tagToAdd}
-                            placeholder="Enter one tag at a time"
+                            rows={3}
                         />
-                        <Button 
-                            variant="outline-success" 
-                            style={{ marginLeft: '1rem' }}
-                            onClick={this.addTag}
-                        >
-                            Add tag
-                        </Button>
-                    </div>
-                    <div className="form-tags">
-                        {this.state.tags.map(tag => (
-                            <h5 className="tag" key={tag}>
-                                <Badge className="text" variant="secondary">{tag}</Badge>
-                                <Badge 
-                                    className="delete" 
-                                    variant="light"
-                                    onClick={() => this.removeTag(tag)}
-                                >
-                                    <i className="fas fa-times" />
-                                </Badge>
-                            </h5>
-                        ))}
-                    </div>
-                </Form.Group>
-                <Field
+                        <Field
+                            label="Desired skills & interests"
+                            name="tags"
+                            component={List}
+                            type="text"
+                            list={this.state.tags}
+                            itemToAdd={this.state.tagToAdd}
+                            addItem={this.addTag}
+                            removeItem={this.removeTag}
+                            onChangeItem={(e) => this.setState({ tagToAdd: e.target.value })}
+                        />
+                    </Tab>
+                </Tabs>
+                {/*<Field
                     label="Goals"
                     name="goals"
                     component={Input}
@@ -227,6 +216,7 @@ const mapStateToProps = state => ({
     updateEventStatus: _.get(state, 'events.selectedEvent.status.update')
 });
 
+// eslint-disable-next-line no-class-assign
 EditEvent = connect(mapStateToProps, { getProjects })(EditEvent);
 
 export default reduxForm({

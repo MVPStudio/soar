@@ -5,6 +5,12 @@ const Schema = mongoose.Schema;
 mongoose.set('runValidators', true);
 
 const UserSchema = new Schema({
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date
+    },
     email: {
         type: String,
         required: 'Please enter an email address.'
@@ -27,9 +33,6 @@ const UserSchema = new Schema({
     },
     description: {
         type: String
-    },
-    createdAt: {
-        type: Date
     },
     organizations: [
         {
@@ -57,6 +60,14 @@ const UserSchema = new Schema({
             }
         }
     ],
+    tags: {
+        type: [String],
+        default: []
+    },
+    referralSource: {
+        type: String,
+        default: ''
+    }
 });
 
 UserSchema.statics.getAttendees = function (attendeeIds) {

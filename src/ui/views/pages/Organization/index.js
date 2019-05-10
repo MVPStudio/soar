@@ -7,6 +7,7 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Badge from 'react-bootstrap/Badge';
 
 import EditOrganization from '../../components/Forms/EditOrganization';
 import { SUCCESS, NOT_STARTED } from '../../../state/statusTypes';
@@ -24,15 +25,11 @@ import './Organization.scss';
 class OrganizationPage extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            organizationID: this.props.computedMatch.params.id,
-            showEditOrgModal: false
-        };
+        this.state = { showEditOrgModal: false };
         this.once = 0;
-    }
 
-    componentDidMount() {
-        this.props.getOrganizationById(this.state.organizationID);
+        const organizationId = _.get(props, 'computedMatch.params.id', '');
+        props.getOrganizationById(organizationId);
     }
 
     componentDidUpdate(prevProps) {
@@ -41,8 +38,7 @@ class OrganizationPage extends Component {
             && this.props.getOrgProjectsStatus === NOT_STARTED
             && !_.isEmpty(this.props.organization.projectIds)
         ) {
-
-            this.props.getOrgProjectsById(this.props.organization.projectIds)
+            this.props.getOrgProjectsById(this.props.organization.projectIds);
         }
 
         const isModalShown = this.state.showEditOrgModal;
@@ -50,6 +46,7 @@ class OrganizationPage extends Component {
         const isNewDataFinal = this.props.updateOrgStatus === SUCCESS;
 
         if (isModalShown && isNewOrgData && isNewDataFinal) {
+            // eslint-disable-next-line react/no-did-update-set-state
             this.setState({ showEditOrgModal: false });
         }
     }
@@ -57,17 +54,16 @@ class OrganizationPage extends Component {
     toggleModal = () => {
         this.setState({ 
             showEditOrgModal: !this.state.showEditOrgModal 
-        })
+        });
     }
 
     addUserToOrganization = () => {
         const { _id, memberIds } = this.props.organization;
-        const newMemberIds = [ ...memberIds, this.props.userId ]
+        const newMemberIds = [...memberIds, this.props.userId];
         this.props.updateOrganization(_id, { memberIds: newMemberIds });
     };
 
-    submitEdits = () => {
-        const updates = _.get(this.props, 'form.values', {});
+    submitEdits = (updates) => {
         this.props.updateOrganization(this.props.organization._id, updates);
     };
 
@@ -91,16 +87,23 @@ class OrganizationPage extends Component {
         );
     }
 
-    renderHeader(name) {
+    renderHeader(name, category) {
         return (
             <div className="org-header">
                 <h1 className="org-name">{name}</h1>
+                <Badge 
+                    pill 
+                    variant="secondary"
+                    style={{ width: 'max-content', marginTop: '0.5rem' }}
+                >
+                    {category}
+                </Badge>
             </div>
-        )
+        );
     }
 
     renderContactInfo(address, website, contactInformation) {
-        const { city, state } = address || {}
+        const { city, state } = address || {};
         const { email, phoneNumber } = contactInformation || {};
         const hasContactInfo = (city && state) || email || phoneNumber;
 
@@ -170,7 +173,7 @@ class OrganizationPage extends Component {
             >
                 Edit organization
             </Button>
-        )
+        );
     }
 
     renderDescription(description) {
@@ -181,7 +184,7 @@ class OrganizationPage extends Component {
                 <div className="description">
                     <Card>
                         <Card.Header>
-                            <h5>Mission Statement</h5>
+                            <b>Mission Statement</b>
                         </Card.Header>
                         <Card.Body>
                             {description}
@@ -195,13 +198,13 @@ class OrganizationPage extends Component {
     renderProjects(projects) {
         const projectsOrMsg = !_.isEmpty(projects)
             ? _.map(projects, (project, index) => this.renderProjectCard(project, index))
-            : <i>No projects yet!</i>
+            : <i>No projects yet!</i>;
 
         return (
             <div className="org-projects">
                 <Card>
                     <Card.Header>
-                        <h5>Projects</h5>
+                        <b>Projects Led</b>
                     </Card.Header>
                     <Card.Body className="org-projects-body">
                         {projectsOrMsg}
@@ -221,7 +224,7 @@ class OrganizationPage extends Component {
                     <div className="top">
                         <Card.Title>{name}</Card.Title>
                         <Card.Text>
-                            {_.truncate(description, { 'length': 250 })}
+                            {_.truncate(description, { length: 250 })}
                         </Card.Text>
                     </div>
                     <Link to={`/project/${_id}`}>
@@ -240,13 +243,13 @@ class OrganizationPage extends Component {
     renderMembers(members) {
         const membersOrMsg = !_.isEmpty(members) 
             ? _.map(members, (member, index) => this.renderMember(member, index))
-            : <i>No members yet!</i>
+            : <i>No members yet!</i>;
 
         return (
             <div className="org-members">
                 <Card>
                     <Card.Header>
-                        <h5>Members</h5>
+                        <b>Members</b>
                     </Card.Header>
                     <Card.Body className="org-members-body">
                         {membersOrMsg}
@@ -259,10 +262,31 @@ class OrganizationPage extends Component {
     renderMember(member, index) {
         return (
             <div key={`member-${index}`} className="org-member">
-                <img src={defaultProfilePic} />
+                <img src={defaultProfilePic} alt={member.name} />
                 <div>{member.name}</div>
             </div>
-        )
+        );
+    }
+
+    renderTags(tags) {
+        if (tags.length > 0) {
+            return (
+                <Card className="org-tags-card">
+                    <Card.Header>
+                        <b>Desired Skills & Interests</b>
+                    </Card.Header>
+                    <Card.Body>
+                        <div className="org-tags">
+                            {_.map(tags, tag => (
+                                <h5 style={{ margin: 0 }}>
+                                    <Badge pill className="tag" variant="success">{tag}</Badge>
+                                </h5>
+                            ))}
+                        </div>
+                    </Card.Body>
+                </Card>
+            );
+        }
     }
 
     render() {
@@ -276,7 +300,9 @@ class OrganizationPage extends Component {
             projects, 
             members, 
             memberIds, 
-            website 
+            website,
+            tags,
+            category
         } = organization;
 
         if (getOrgStatus !== SUCCESS) return <Loader />;
@@ -286,13 +312,14 @@ class OrganizationPage extends Component {
         return (
             <div className="org-page">
                 {this.renderModal()}
-                {this.renderHeader(name)}
+                {this.renderHeader(name, category)}
                 <hr />
                 <div className="org-content">
                     <div className="side">
                         {this.renderJoinButton(userIsMember)}
                         {this.renderEditButton()}
                         {this.renderContactInfo(address, website, contactInformation)}
+                        {this.renderTags(tags)}
                         {this.renderMembers(members)}
                     </div>
                     <div className="main">

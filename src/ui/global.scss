@@ -12,6 +12,20 @@ a {
     padding: 0 1rem;
 }
 
+.card-header-tabs {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 0;
+}
+
+.tab-content {
+    margin: 1rem 0;
+}
+
+.jumbotron {
+    background-color: rgba(0,0,0,.03);
+    border: 1px solid rgba(0,0,0,.125);
+}
+
 form, .form-group {
     hr {
         margin: 1.5rem 0;
@@ -53,14 +67,12 @@ form, .form-group {
         font-variant: small-caps;
     }
 
-    .form-tags {
+    .form-list {
         display: flex;
         flex-flow: row wrap;
         margin-top: 0.5rem;
 
-        .tag {
-            display: flex;
-            flex-flow: row nowrap;
+        .item {
             margin: 0 0.5rem 0.5rem 0;
 
             .text {
@@ -74,6 +86,7 @@ form, .form-group {
                 border: 1px solid #6c757d;
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
+                padding: 0.2rem 0.35rem;
 
                 &:hover {
                     color: red;

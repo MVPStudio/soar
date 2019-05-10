@@ -1,5 +1,34 @@
 import React, { Fragment } from 'react';
 
+export const StatusSelect = () => (
+    <Fragment>
+        <option value="Ongoing">Ongoing</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+    </Fragment>
+);
+
+export const ReferralSelect = () => (
+    <Fragment>
+        <option value="ECAN website">ECAN website</option>
+        <option value="Google search">Google search</option>
+        <option value="Word of mouth">Word of mouth</option>
+    </Fragment>
+);
+
+export const CategorySelect = () => (
+    <Fragment>
+        <option value="Business">Business</option>
+        <option value="Culture">Culture</option>
+        <option value="Education">Education</option>
+        <option value="Environment">Environment</option>
+        <option value="Habitat">Habitat</option>
+        <option value="Law">Law</option>
+        <option value="Religion">Religion</option>
+        <option value="Science">Science</option>
+    </Fragment>
+);
+
 export const StateSelect = () => (
     <Fragment>
         <option value="AL">Alabama</option>

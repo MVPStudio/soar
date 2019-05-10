@@ -3,17 +3,20 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
-import { SUCCESS, NOT_STARTED, LOADING } from '../../../state/statusTypes';
-import EditUser from '../../components/Forms/EditUser';
-import { getUserByID, deleteUser, updateUser } from '../../../state/actions/userActions';
-import { logoutUser } from '../../../state/actions/authenticationActions';
-import { getOrganizations, getOrganizationsById } from '../../../state/actions/organizationActions';
-
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
+
+import EditUser from '../../components/Forms/EditUser';
 import Loader from '../../components/Loader';
+
+import { SUCCESS, NOT_STARTED, LOADING } from '../../../state/statusTypes';
+import { getUserByID, deleteUser, updateUser } from '../../../state/actions/userActions';
+import { logoutUser } from '../../../state/actions/authenticationActions';
+import { getOrganizations, getOrganizationsById } from '../../../state/actions/organizationActions';
+
 import './User.scss';
 
 class User extends Component {
@@ -35,12 +38,12 @@ class User extends Component {
         const updateComplete = this.props.updateUserStatus === SUCCESS && prevProps.updateUserStatus === LOADING;
 
         if (updateComplete) {
-            this.setState({ showEditModal: false })
+            // eslint-disable-next-line react/no-did-update-set-state
+            this.setState({ showEditModal: false });
         }
     }
 
-    submitEdits = () => {
-        const updates = _.get(this.props, 'form.values', {});
+    submitEdits = (updates) => {
         this.props.updateUser(this.props.user._id, updates);
     };
 
@@ -70,7 +73,7 @@ class User extends Component {
             <div className="user-header">
                 <h1 className="user-name">{name}</h1>
             </div>
-        )
+        );
     }
 
     renderEditButton() {
@@ -82,21 +85,21 @@ class User extends Component {
             >
                 Edit profile
             </Button>
-        )
+        );
     }
 
-    renderContactInfo(email, website, city, state, phoneNumber) {
-        const listItems = _.map(arguments, item => {
+    renderContactInfo(...args) {
+        const listItems = _.map(args, (item, i) => {
             const itemExists = !_.isUndefined(item) && !_.isEmpty(item);
 
             if (itemExists) {
                 return (
-                    <ListGroup.Item>
+                    <ListGroup.Item key={`user-info-${i}`}>
                         <div>{item}</div>
                     </ListGroup.Item>
                 );
             }
-        })
+        });
 
         return (
             <div className="contact">
@@ -112,25 +115,27 @@ class User extends Component {
     }
 
     renderDescription(description) {
-        return (
-            <div className="description">
-                <Card>
-                    <Card.Header>
-                        <h5>About Me</h5>
-                    </Card.Header>
-                    <Card.Body>
-                        {description}
-                    </Card.Body>
-                </Card>
-            </div>
-        );
+        if (description) {
+            return (
+                <div className="description">
+                    <Card>
+                        <Card.Header>
+                            <h5>About Me</h5>
+                        </Card.Header>
+                        <Card.Body>
+                            {description}
+                        </Card.Body>
+                    </Card>
+                </div>
+            );
+        }
     }
 
     renderOrganizations() {
         const organizations = _.filter(this.props.organizations.data, org => _.includes(org.memberIds, this.props.user._id));
         const organizationsOrMsg = !_.isEmpty(organizations)
             ? _.map(organizations, (organization, index) => this.renderOrgCard(organization, index))
-            : <i>No organizations yet!</i>
+            : <i>No organizations yet!</i>;
 
         return (
             <div className="user-orgs">
@@ -155,7 +160,7 @@ class User extends Component {
                     <div className="top">
                         <Card.Title>{name}</Card.Title>
                         <Card.Text>
-                            {_.truncate(description, { 'length': 250 })}
+                            {_.truncate(description, { length: 250 })}
                         </Card.Text>
                     </div>
                     <Link to={`/organization/${_id}`}>
@@ -171,10 +176,40 @@ class User extends Component {
         );
     }
 
+    renderTags(tags) {
+        if (tags.length > 0) {
+            return (
+                <Card className="user-tags-card">
+                    <Card.Header>
+                        <b>My Skills & Interests</b>
+                    </Card.Header>
+                    <Card.Body>
+                        <div className="user-tags">
+                            {_.map(tags, tag => (
+                                <h5 style={{ margin: 0 }}>
+                                    <Badge pill className="tag" variant="success">{tag}</Badge>
+                                </h5>
+                            ))}
+                        </div>
+                    </Card.Body>
+                </Card>
+            );
+        }
+    }
+
     render() {
         const { user, getUserStatus, updateUserStatus } = this.props;
-        const { name, email, website, location, phoneNumber, description } = user;
-        const hasContactInfo = email || website || phoneNumber || location;
+
+        const { 
+            name, 
+            email, 
+            website, 
+            location, 
+            phoneNumber, 
+            description,
+            tags
+        } = user;
+
         const nameExists = !_.isUndefined(name) && !_.isEmpty(name);
 
         if (getUserStatus === LOADING || updateUserStatus === LOADING) return <Loader />;
@@ -187,15 +222,16 @@ class User extends Component {
                 <div className="user-content">
                     <div className="side">
                         {this.renderEditButton()}
-                        {hasContactInfo && this.renderContactInfo(email, website, location, phoneNumber)}
+                        {this.renderContactInfo(email, website, location, phoneNumber)}
+                        {this.renderTags(tags)}
                     </div>
                     <div className="main">
-                        {description && this.renderDescription(description)}
+                        {this.renderDescription(description)}
                         {this.renderOrganizations()}
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
