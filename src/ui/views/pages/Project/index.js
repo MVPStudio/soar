@@ -134,7 +134,6 @@ class Project extends Component {
                         </Fragment>
                     }
                 </Jumbotron>
-                {/* <img className="project-image" src={parkImg} alt="project" /> */}
             </Fragment>
         );
     }
