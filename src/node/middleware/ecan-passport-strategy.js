@@ -7,15 +7,16 @@ const UserModel = require('../models/userModel');
 const RequestError = require('../lib/Errors');
 
 //Config load jwt secret from keys file
-const keys = require('../config/keys');
+const secretOrKey = process.env.JWT_SECRET;
+
 //Check config file for jwt secret, throw error if not found
-if (!_.get(keys, 'jwt.secretOrKey', false)) {
+if (!secretOrKey) {
     throw new RequestError('Keys file with jwt secret is required', 'NOT_FOUND');
 }
 //Set jwt opts, note - expects token in Authorization header as bearer token
 const jwtOpts = {
     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: keys.jwt.secretOrKey
+    secretOrKey
 };
 /*
     This is the middleware strategy.
