@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { logoutUser } from '../actions/authentication';
+import { withRouter } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -21,8 +25,33 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const Navbar = () => {
+const Navbar = (props) => {
+    const { isAuthenticated, user } = props.auth;
     const classes = useStyles();
+
+    const onLogout = (e) => {
+        e.preventDefault();
+        props.logoutUser(props.history);
+    }
+
+    const loggedInLinks = (
+        <Fragment>
+            <Link to="/login">
+                <Button color="inherit" onClick={onLogout}>Logout</Button>
+            </Link>
+        </Fragment>
+    );
+
+    const loggedOutLinks = (
+        <Fragment>
+            <Link to="/login">
+                <Button color="inherit">Login</Button>
+            </Link>
+            <Link to="/register">
+                <Button color="inherit">Sign up</Button>
+            </Link>
+        </Fragment>
+    );
 
     return (
         <div className={classes.root}>
@@ -36,16 +65,20 @@ const Navbar = () => {
                             SOAR Network
                         </Link>
                     </Typography>
-                    <Link to="/login">
-                        <Button color="inherit">Login</Button>
-                    </Link>
-                    <Link to="/register">
-                        <Button color="inherit">Sign up</Button>
-                    </Link>
+                    { isAuthenticated ? loggedInLinks : loggedOutLinks }
                 </Toolbar>
             </AppBar>
         </div>
     );
 }
 
-export default Navbar;
+Navbar.propTypes = {
+    logoutUser: PropTypes.func.isRequired,
+    auth: PropTypes.object.isRequired
+}
+
+const mapStateToProps = (state) => ({
+    auth: state.auth
+})
+
+export default connect(mapStateToProps, { logoutUser })(withRouter(Navbar));

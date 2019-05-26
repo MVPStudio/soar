@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const OrganizationSchema = new Schema({
+const UserSchema = new Schema({
     name: {
         type: String,
         required: true
@@ -15,12 +15,12 @@ const OrganizationSchema = new Schema({
         type: String,
         required: true
     },
-    dateCreated: {
+    createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
-const Organization = mongoose.model('organizations', OrganizationSchema);
+const User = mongoose.model('users', UserSchema);
 
-module.exports = Organization;
+module.exports = User;
