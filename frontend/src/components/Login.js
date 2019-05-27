@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import { func, object } from 'prop-types';
 import { connect } from 'react-redux';
 import { loginUser } from '../actions/authentication';
 import classnames from 'classnames';
@@ -23,7 +23,7 @@ class Login extends PureComponent {
             email: this.state.email,
             password: this.state.password,
         }
-        this.props.loginUser(user);
+        this.props.loginUser(user, this.props.history);
     }
 
     componentDidMount() {
@@ -87,9 +87,9 @@ class Login extends PureComponent {
 }
 
 Login.propTypes = {
-    loginUser: PropTypes.func.isRequired,
-    auth: PropTypes.object.isRequired,
-    errors: PropTypes.object.isRequired
+    loginUser: func.isRequired,
+    auth: object.isRequired,
+    errors: object.isRequired
 }
 
 const mapStateToProps = (state) => ({

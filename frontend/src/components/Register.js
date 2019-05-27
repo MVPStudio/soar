@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func, object } from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { registerUser } from '../actions/authentication';
 import classnames from 'classnames';
@@ -118,8 +118,8 @@ class Register extends PureComponent {
 }
 
 Register.propTypes = {
-    registerUser: PropTypes.func.isRequired,
-    auth: PropTypes.object.isRequired
+    registerUser: func.isRequired,
+    auth: object.isRequired
 };
 
 const mapStateToProps = state => ({

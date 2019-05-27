@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { func, object } from 'prop-types';
 import { connect } from 'react-redux';
 import { logoutUser } from '../actions/authentication';
 import { withRouter } from 'react-router-dom';
@@ -73,8 +73,8 @@ const Navbar = (props) => {
 }
 
 Navbar.propTypes = {
-    logoutUser: PropTypes.func.isRequired,
-    auth: PropTypes.object.isRequired
+    logoutUser: func.isRequired,
+    auth: object.isRequired
 }
 
 const mapStateToProps = (state) => ({

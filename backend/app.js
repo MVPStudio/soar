@@ -7,8 +7,8 @@ const config = require('./db');
 const users = require('./routes/user'); 
 
 mongoose.connect(config.DB, { useNewUrlParser: true }).then(
-    () => {console.log('Database is connected') },
-    err => { console.log('Can not connect to the database'+ err)}
+    () => { console.log('Database is connected') },
+    err => { console.log('Can not connect to the database:', err) }
 );
 
 const app = express();
@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 
 app.use('/api/users', users);
 
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
     res.send('hello');
 });
 
