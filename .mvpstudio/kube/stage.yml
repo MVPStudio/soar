@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: mvpstudio/ecan-soar:4237349
+        image: mvpstudio/ecan-soar:438e1c1
         resources:
            limits:
               cpu: 0.25
