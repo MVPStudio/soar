@@ -4,6 +4,7 @@ const OrganizationModel = mongoose.model('OrganizationModel');
 const UserModel = mongoose.model('UserModel');
 const RequestError = require('../lib/Errors');
 const ObjectId = require('mongodb').ObjectId;
+const UserService = require('./userService');
 
 module.exports = {
     getAll(req, res, next) {
@@ -26,7 +27,7 @@ module.exports = {
             const orgWithMembers = _.assign(organization, { members })
 
             res.status(200).send(orgWithMembers)
-        } catch(error) {
+        } catch (error) {
             console.log(error)
             res.status(error.status || 500).send(error);
         }
@@ -40,6 +41,11 @@ module.exports = {
             .catch(error => {
                 res.status(error.status || 500).send(error);
             });
+    },
+
+    createWithUser: async ({ user, organization }) => {
+        const org = await OrganizationModel.create(organization);
+        await UserService.createWithOrganization(user, org);
     },
 
     createOrUpdate(req, res, next) {

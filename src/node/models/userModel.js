@@ -46,9 +46,9 @@ const UserSchema = new Schema({
     ],
     roles: [
         {
-            role_id: {
-                type: Schema.Types.ObjectId
-            },
+            // role_id: {
+            //     type: Schema.Types.ObjectId
+            // },
             entity: {
                 type: String,
                 enum: ['project', 'organization', 'event', 'site'],
