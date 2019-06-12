@@ -15,6 +15,7 @@ require('./models/organizationModel');
 require('./models/projectModel');
 require('./models/eventModel');
 require('./models/userModel');
+require('./models/tagModel');
 
 // mongoose connection
 mongoose.Promise = global.Promise;
@@ -59,14 +60,15 @@ require('./routes/organizationRoutes')(app);
 require('./routes/projectRoutes')(app);
 require('./routes/eventRoutes')(app);
 require('./routes/userRoutes')(app);
+require('./routes/tagRoutes')(app);
 
 app.get('/api/health', (req, res) => res.status(200).send({ msg: 'Active' }));
 
 app.use(express.static(publicDirectory));
 app.get('*', (req, res) =>
     res
-    .type('html')
-    .sendFile(path.join(publicDirectory, 'index.html'))
+        .type('html')
+        .sendFile(path.join(publicDirectory, 'index.html'))
 );
 
 app.listen(port, () => console.log(`ECAN server started on: ${port}`));
