@@ -13,7 +13,7 @@ const { authenticate } = require('../middleware/ecan-passport-strategy');
 const SALT_ROUNDS = 10;
 const TOKEN_LIFETIME = 3600;
 
-module.exports = {
+const UserService = {
     getAll: (req, res, next, user) => {
         UserModel.find()
             .then(userRecords => {
@@ -122,6 +122,28 @@ module.exports = {
             .catch(error => res.status(error.status || 500).send({ error }));
     },
 
+    createWithOrganization: async (user, organization) => {
+        user.roles = [{
+            entity: 'organization',
+            entity_id: organization.id
+        }];
+        return UserService.create(user);
+    },
+
+    create: async (user) => {
+        const usersWithEmail = await UserModel.find({ email: user.email })
+
+        if (_.isArray(usersWithEmail) && usersWithEmail.length > 0) {
+            throw new RequestError(`Email: ${email} already exists.`, 'BAD_REQUEST');
+        }
+
+        const hash = await getHash(user.password, SALT_ROUNDS);
+        const newUser = Object.assign({}, user, { password: hash, createdAt: moment() });
+        const newUserDocument = await UserModel.create(newUser)
+
+        return _.omit(newUserDocument, 'password');
+    },
+
     createOrUpdate: (req, res, next) => {
         const { email, password } = req.body;
         if (!req.params.user_id) {
@@ -152,58 +174,58 @@ module.exports = {
              Updating a user
              */
             // authenticate(req, res, next, () => {
-                UserModel.findOne({ _id: req.params.user_id })
+            UserModel.findOne({ _id: req.params.user_id })
                 .then(userRecord => {
-                        if (_.isEmpty(userRecord)) {
-                            throw new RequestError(`User with email ${req.params.user_id} not found`, 'NOT_FOUND');
-                        }
+                    if (_.isEmpty(userRecord)) {
+                        throw new RequestError(`User with email ${req.params.user_id} not found`, 'NOT_FOUND');
+                    }
 
-                        //Lookup the email for someone with a different id so you could still pass in your current email and have it not freak out
-                        return UserModel.find({ email, _id: { $ne: req.params.user_id } }).count();
-                    })
-                    .then(userRes => {
-                        if (!_.isUndefined(userRes) && _.isInteger(userRes) && userRes > 0) {
-                            throw new RequestError(`Email: ${email} already exists.`, 'BAD_REQUEST');
-                        }
+                    //Lookup the email for someone with a different id so you could still pass in your current email and have it not freak out
+                    return UserModel.find({ email, _id: { $ne: req.params.user_id } }).count();
+                })
+                .then(userRes => {
+                    if (!_.isUndefined(userRes) && _.isInteger(userRes) && userRes > 0) {
+                        throw new RequestError(`Email: ${email} already exists.`, 'BAD_REQUEST');
+                    }
 
-                        const updatedRecord = req.body;
-                        const userId = req.params.user_id;
+                    const updatedRecord = req.body;
+                    const userId = req.params.user_id;
 
-                        if (!updatedRecord.password) {
-                            return UserModel.findByIdAndUpdate(ObjectId(userId), updatedRecord, { new: true })
-                                .then(result => {
-                                    const resultObject = result.toObject();
-                                    delete resultObject.password;
+                    if (!updatedRecord.password) {
+                        return UserModel.findByIdAndUpdate(ObjectId(userId), updatedRecord, { new: true })
+                            .then(result => {
+                                const resultObject = result.toObject();
+                                delete resultObject.password;
 
-                                    return res.status(200).send(resultObject);
-                                })
-                                .catch(err => {
-                                    res.status(err.status || 500).send(err)
-                                });
-                        }
-                    })
-                        //User is updating password
-                    //     getHash(password, SALT_ROUNDS)
-                    //         .then(hash => {
-                    //             return Object.assign({}, updatedRecord, { password: hash });
-                    //         })
-                    //         .then(updatedRecordWithHashedPassword => {
-                    //             UserModel.update({ _id: req.params.user_id }, updatedRecordWithHashedPassword)
-                    //                 .then(newUserRecord => {
-                    //                     newUserRecord = newUserRecord.toObject();
-                    //                     res.status(200).send(_.omit(newUserRecord, 'password'));
-                    //                 })
-                    //                 .catch(err => {
-                    //                     throw new RequestError(`Failed to update record in DB: ${err}`, 'INTERNAL_SERVICE_ERROR')
-                    //                 });
-                    //         })
-                    //         .catch(err => {
-                    //             throw new RequestError(`Failed to get password hash: ${err}`, 'INTERNAL_SERVICE_ERROR')
-                    //         });
-                    // })
-                    .catch(error => {
-                        res.status(error.status || 500).send(error);
-                    });
+                                return res.status(200).send(resultObject);
+                            })
+                            .catch(err => {
+                                res.status(err.status || 500).send(err)
+                            });
+                    }
+                })
+                //User is updating password
+                //     getHash(password, SALT_ROUNDS)
+                //         .then(hash => {
+                //             return Object.assign({}, updatedRecord, { password: hash });
+                //         })
+                //         .then(updatedRecordWithHashedPassword => {
+                //             UserModel.update({ _id: req.params.user_id }, updatedRecordWithHashedPassword)
+                //                 .then(newUserRecord => {
+                //                     newUserRecord = newUserRecord.toObject();
+                //                     res.status(200).send(_.omit(newUserRecord, 'password'));
+                //                 })
+                //                 .catch(err => {
+                //                     throw new RequestError(`Failed to update record in DB: ${err}`, 'INTERNAL_SERVICE_ERROR')
+                //                 });
+                //         })
+                //         .catch(err => {
+                //             throw new RequestError(`Failed to get password hash: ${err}`, 'INTERNAL_SERVICE_ERROR')
+                //         });
+                // })
+                .catch(error => {
+                    res.status(error.status || 500).send(error);
+                });
             // });
         }
     },
@@ -223,3 +245,5 @@ module.exports = {
         }
     }
 };
+
+module.exports = UserService;
