@@ -6,12 +6,50 @@
         min-width: 100%; 
         min-height: 100%;
     }
+
+    .cta-container {
+        width: 100%;
+        position: absolute;
+        top: 40%;
+        left: 0;
+
+        .call-to-action {
+            width: 500px;
+            margin: auto;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+    
+            .title {
+                color: white;
+                font-weight: bold;
+                margin: auto;
+                width: max-content;
+                margin-bottom: 1rem;
+            }
+    
+            hr {
+                border-color: white;
+            }
+    
+            .description {
+                color: white;
+                margin-bottom: 1rem;
+                font-style: italic;
+            }
+    
+            button {
+                width: 100%;
+            }
+        }
+    }
+    
     .video-overlay {
         position: fixed;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.75);
+        background: rgba(0, 0, 0, 0.5);
         color: #f1f1f1;
         width: 100%;
         padding: 20px;

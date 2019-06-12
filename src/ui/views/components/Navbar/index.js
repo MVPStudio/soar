@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
 import Nav from 'react-bootstrap/Nav';
-import NavDropdown from 'react-bootstrap/NavDropdown';
 import BootNavbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
@@ -14,17 +13,9 @@ import './Navbar.scss';
 class Navbar extends Component {
     renderExplore() {
         return (
-            <NavDropdown title="Explore">
-                <NavDropdown.Item>
-                    <Link to="/explore#events">Events</Link>
-                </NavDropdown.Item>
-                <NavDropdown.Item>
-                    <Link to="/explore#projects">Projects</Link>
-                </NavDropdown.Item>
-                <NavDropdown.Item>
-                    <Link to="/explore#organizations">Organizations</Link>
-                </NavDropdown.Item>
-            </NavDropdown>
+            <Link to="/explore">
+                <Button variant="outline-success">Explore</Button>
+            </Link>
         );
     }
 
@@ -35,7 +26,7 @@ class Navbar extends Component {
 
         return (
             <Link to={link}>
-                <Button variant="outline-success">{text}</Button>
+                <Button variant="outline-primary">{text}</Button>
             </Link>
         );
     }
@@ -47,7 +38,7 @@ class Navbar extends Component {
 
         return (
             <Link to={link}>
-                <Button variant="outline-primary">{text}</Button>
+                <Button variant="outline-secondary">{text}</Button>
             </Link>
         );
     }

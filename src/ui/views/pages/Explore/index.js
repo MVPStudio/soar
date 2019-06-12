@@ -10,44 +10,11 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Dropdown from 'react-bootstrap/Dropdown';
 
-import EventFeed from '../../components/Feeds/EventFeed';
-import ProjectFeed from '../../components/Feeds/ProjectFeed';
 import OrganizationFeed from '../../components/Feeds/OrganizationFeed';
 import { getOrganizations } from '../../../state/actions/organizationActions';
 import './Explore.scss';
 
-const categoryHashes = [
-    '#events', 
-    '#projects', 
-    '#organizations'
-];
-
 class Explore extends Component {
-    constructor(props) {
-        super(props);
-
-        const category = categoryHashes.includes(props.location.hash)
-            ? props.location.hash.replace('#', '')
-            : 'events';
-
-        this.state = {
-            category
-        };
-    }
-    
-    componentDidUpdate(prevProps) {
-        if (this.props.location.hash !== prevProps.location.hash) {
-            const category = categoryHashes.includes(this.props.location.hash)
-                ? this.props.location.hash.replace('#', '')
-                : this.state.category;
-
-            if (category !== this.state.category) {
-                // eslint-disable-next-line react/no-did-update-set-state
-                this.setState({ category });
-            }
-        }
-    }
-
     renderAddButton() {
         let link;
         let text;
@@ -85,7 +52,7 @@ class Explore extends Component {
         return (
             <div className="search">
                 <InputGroup>
-                    <FormControl placeholder={`Search ${this.state.category}...`} />
+                    <FormControl placeholder="Search organizations..." />
                     <InputGroup.Append>
                         <Button variant="outline-secondary">
                             <i className="fas fa-search" />
@@ -165,34 +132,16 @@ class Explore extends Component {
         );
     }
 
-    renderFeed() {
-        switch (this.state.category) {
-            case 'events':
-                return <EventFeed />;
-            case 'projects':
-                return <ProjectFeed />;
-            case 'organizations':
-                return <OrganizationFeed />;
-            default:
-                break;
-        }
-    }
-
     render() {
         return (
             <div className="explore-page">
-                <div className="side">
-                    {this.renderSearch()}
-                    {this.renderAddButton()}
-                    {this.renderFilter()}
-                </div>
                 <div className="main">
-                    <div className="categories-sort">
-                        {this.renderCategories()}
-                        {this.renderSort()}
-                    </div>
-                    <div className="feed">
-                        {this.renderFeed()}
+                    {this.renderSearch()}
+                    <div className="filter-feed">
+                        {/* {this.renderFilter()} */}
+                        <div className="feed">
+                            <OrganizationFeed />
+                        </div>
                     </div>
                 </div>
             </div>
