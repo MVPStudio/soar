@@ -7,30 +7,12 @@ const ObjectId = require('mongodb').ObjectId;
 const UserService = require('./userService');
 
 module.exports = {
-    getAll(req, res, next) {
+    getAll() {
         return OrganizationModel.find()
-            .then(organizationRecords => {
-                res.status(200).send(organizationRecords);
-            })
-            .catch(error => {
-                res.status(error.status || 500).send(error);
-            });
     },
 
-    async getByID(req, res, next) {
-        try {
-            const organization = await OrganizationModel
-                .findById(req.params.organization_id)
-                .then(organization => organization.toObject())
-
-            const members = await UserModel.find({ _id: { $in: organization.memberIds } }, '-password')
-            const orgWithMembers = _.assign(organization, { members })
-
-            res.status(200).send(orgWithMembers)
-        } catch (error) {
-            console.log(error)
-            res.status(error.status || 500).send(error);
-        }
+    async getByID(organization_id) {
+        return await (OrganizationModel.findById(organization_id)).toObject()
     },
 
     getMultipleByID(req, res, next) {
