@@ -17,7 +17,7 @@
         "lint:fix": "eslint ./src --fix"
     },
     "dependencies": {
-        "axios": "^0.18.0",
+        "axios": "^0.19.0",
         "babel": "^6.23.0",
         "babel-eslint": "^8.2.6",
         "babel-polyfill": "^6.26.0",
@@ -26,7 +26,7 @@
         "bootstrap": "^4.2.1",
         "classnames": "^2.2.5",
         "css-loader": "^0.28.11",
-        "eslint": "4.18.1",
+        "eslint": "4.19.1",
         "eslint-config-cbtnuggets": "^7.0.5",
         "eslint-plugin-es6": "^1.0.0",
         "eslint-plugin-import": "^2.17.2",
@@ -41,7 +41,7 @@
         "moment": "^2.22.1",
         "mongodb": "^3.1.4",
         "mongoose": "^5.0.13",
-        "node-sass": "^4.8.3",
+        "node-sass": "^4.12.0",
         "nodemon": "^1.17.3",
         "passport": "^0.4.0",
         "passport-jwt": "^4.0.0",
