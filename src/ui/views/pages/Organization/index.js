@@ -290,7 +290,7 @@ class OrganizationPage extends Component {
     }
 
     render() {
-        const { organization, getOrgStatus, userId } = this.props;
+        const { organization, getOrgStatus } = this.props;
 
         const { 
             name, 
@@ -298,16 +298,12 @@ class OrganizationPage extends Component {
             contactInformation, 
             description, 
             projects, 
-            members, 
-            memberIds, 
             website,
             tags,
             category
         } = organization;
 
         if (getOrgStatus !== SUCCESS) return <Loader />;
-        
-        const userIsMember = _.includes(memberIds, userId);
 
         return (
             <div className="org-page">
@@ -316,11 +312,9 @@ class OrganizationPage extends Component {
                 <hr />
                 <div className="org-content">
                     <div className="side">
-                        {this.renderJoinButton(userIsMember)}
                         {this.renderEditButton()}
                         {this.renderContactInfo(address, website, contactInformation)}
                         {this.renderTags(tags)}
-                        {this.renderMembers(members)}
                     </div>
                     <div className="main">
                         {this.renderDescription(description)}
