@@ -66,9 +66,21 @@ const endpoints = {
 
     CREATE_USER_ROLE: '/user/:user_id/role',
 
-    DELETE_USER_ROLE: '/user/:user_id/role/:role_id'
+    DELETE_USER_ROLE: '/user/:user_id/role/:role_id',
+
+    /*
+     * Tag endpoints
+     */
+    GET_TAGS: '/tags',
+
+    GET_TAG_BY_ID: '/tag/:tag_id',
+
+    POST_TAG: '/tag',
+
+    DELETE_TAG_BY_ID: '/tag/:tag_id',
+
 };
 
-module.exports = _.mapValues(endpoints, 
+module.exports = _.mapValues(endpoints,
     endpointURL => `/api${endpointURL}`
 );
