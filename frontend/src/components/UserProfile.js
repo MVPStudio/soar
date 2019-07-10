@@ -6,7 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 
-import { getLoggedInUser } from '../actions/user';
+import { getLoggedInUser } from '../redux/actions/user';
 
 class UserProfile extends PureComponent {
     componentDidMount() {

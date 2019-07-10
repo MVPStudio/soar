@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { func, object } from 'prop-types';
 import { connect } from 'react-redux';
-import { loginUser } from '../actions/authentication';
+import { loginUser } from '../redux/actions/authentication';
 import classnames from 'classnames';
 
 class Login extends PureComponent {

@@ -8,8 +8,7 @@ const OrganizationSchema = new Schema({
         required: true
     },
     category: {
-        type: String,
-        required: true
+        type: String
     },
     phone: {
         type: String

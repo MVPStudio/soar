@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { func, object } from 'prop-types';
 import { connect } from 'react-redux';
-import { logoutUser } from '../actions/authentication';
+import { logoutUser } from '../redux/actions/authentication';
 import { withRouter } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Navbar = (props) => {
-    const { isAuthenticated, user } = props.auth;
+    const { isAuthenticated/*, user*/ } = props.auth;
     const classes = useStyles();
 
     const onLogout = (e) => {
@@ -36,20 +36,23 @@ const Navbar = (props) => {
 
     const loggedInLinks = (
         <Fragment>
-            <Link to="/login">
-                <Button color="inherit" onClick={onLogout}>Logout</Button>
-            </Link>
+            <Button component={Link} to="/profile" color="inherit">
+                Profile
+            </Button>
+            <Button onClick={onLogout} color="inherit">
+                Logout
+            </Button>
         </Fragment>
     );
 
     const loggedOutLinks = (
         <Fragment>
-            <Link to="/login">
-                <Button color="inherit">Login</Button>
-            </Link>
-            <Link to="/register">
-                <Button color="inherit">Sign up</Button>
-            </Link>
+            <Button component={Link} to="/login" color="inherit">
+                Login
+            </Button>
+            <Button component={Link} to="/signup" color="inherit">
+                Sign up
+            </Button>
         </Fragment>
     );
 
@@ -61,10 +64,11 @@ const Navbar = (props) => {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                        <Link to="/">
-                            SOAR Network
-                        </Link>
+                        SOAR Network
                     </Typography>
+                    <Button component={Link} to="/explore" color="inherit">
+                        Explore
+                    </Button>
                     { isAuthenticated ? loggedInLinks : loggedOutLinks }
                 </Toolbar>
             </AppBar>
