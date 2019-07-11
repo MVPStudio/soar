@@ -9,6 +9,7 @@ import Login from './components/Login';
 import Home from './components/Home';
 import UserProfile from './components/UserProfile';
 import Explore from './components/Explore';
+import Organization from './components/Organization';
 import PrivateRoute from './components/PrivateRoute';
 
 import checkAuthToken from './utils/auth/checkAuthToken';
@@ -23,9 +24,10 @@ class App extends PureComponent {
                         <Navbar />
                         <Route exact path="/" component={Home} />
                         <Fragment>
-                            <Route exact path="/explore" component={Explore} />
                             <Route exact path="/signup" component={Register} />
                             <Route exact path="/login" component={Login} />
+                            <Route exact path="/explore" component={Explore} />
+                            <Route exact path="/org/:id" component={Organization} />
                             <PrivateRoute
                                 exact
                                 path="/profile"

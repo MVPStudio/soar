@@ -27,4 +27,9 @@ router.get('/all', (req, res) => {
     .then(orgs => res.status(200).json(orgs))
 })
 
+router.get('/:id', (req, res) => {
+    Organization.findOne({ _id: req.params.id })
+    .then(org => res.status(200).json(org))
+})
+
 module.exports = router;

@@ -1,15 +1,17 @@
 import { 
-    GET_ORGS_LOADING, 
-    GET_ORGS_SUCCESS, 
-    GET_ORGS_FAILURE 
+    GET_ORGS_LOADING, GET_ORGS_SUCCESS, GET_ORGS_FAILURE,
+    GET_ORG_LOADING, GET_ORG_SUCCESS, GET_ORG_FAILURE 
 } from '../actions/types';
 
 const initialState = {
-    data: {
-        all: [],
+    allOrgs: {
+        data: [],
+        status: 'NOT_STARTED'
     },
-    error: {},
-    status: 'NOT_STARTED'
+    selectedOrg: {
+        data: {},
+        status: 'NOT_STARTED'
+    }
 }
 
 export default (state = initialState, action) => {
@@ -19,21 +21,52 @@ export default (state = initialState, action) => {
         case GET_ORGS_LOADING:
             return {
                 ...state,
-                status: 'LOADING'
+                allOrgs: {
+                    data: [],
+                    status: 'LOADING'
+                }
             }
         case GET_ORGS_SUCCESS:
             return {
                 ...state,
-                data: {
-                    all: payload
-                },
-                status: 'SUCCESS'
+                allOrgs: {
+                    data: payload,
+                    status: 'SUCCESS'
+                }
             }
         case GET_ORGS_FAILURE:
             return {
                 ...state,
-                error: payload,
-                status: 'FAILURE'
+                allOrgs: {
+                    data: [],
+                    error: payload,
+                    status: 'FAILURE'
+                }
+            }
+        case GET_ORG_LOADING:
+            return {
+                ...state,
+                selectedOrg: {
+                    data: {},
+                    status: 'LOADING'
+                }
+            }
+        case GET_ORG_SUCCESS:
+            return {
+                ...state,
+                selectedOrg: {
+                    data: payload,
+                    status: 'SUCCESS'
+                }
+            }
+        case GET_ORG_FAILURE:
+            return {
+                ...state,
+                selectedOrg: {
+                    data: {},
+                    error: payload,
+                    status: 'FAILURE'
+                }
             }
         default:
             return state;
