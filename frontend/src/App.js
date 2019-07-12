@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './redux/store';
@@ -15,31 +15,29 @@ import PrivateRoute from './components/PrivateRoute';
 import checkAuthToken from './utils/auth/checkAuthToken';
 import './App.scss';
 
-class App extends PureComponent {
-    render() {
-        return (
-            <Provider store={store}>
-                <Router>
+const App = () => {
+    return (
+        <Provider store={store}>
+            <Router>
+                <Fragment>
+                    <Navbar />
+                    <Route exact path="/" component={Home} />
                     <Fragment>
-                        <Navbar />
-                        <Route exact path="/" component={Home} />
-                        <Fragment>
-                            <Route exact path="/signup" component={Register} />
-                            <Route exact path="/login" component={Login} />
-                            <Route exact path="/explore" component={Explore} />
-                            <Route exact path="/org/:id" component={Organization} />
-                            <PrivateRoute
-                                exact
-                                path="/profile"
-                                isLoggedIn={checkAuthToken()}
-                                component={UserProfile}
-                            />
-                        </Fragment>
+                        <Route exact path="/signup" component={Register} />
+                        <Route exact path="/login" component={Login} />
+                        <Route exact path="/explore" component={Explore} />
+                        <Route exact path="/org/:id" component={Organization} />
+                        <PrivateRoute
+                            exact
+                            path="/profile"
+                            isLoggedIn={checkAuthToken()}
+                            component={UserProfile}
+                        />
                     </Fragment>
-                </Router>
-            </Provider>
-        );
-    }
+                </Fragment>
+            </Router>
+        </Provider>
+    );
 }
 
 export default App;

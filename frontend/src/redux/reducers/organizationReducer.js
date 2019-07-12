@@ -1,6 +1,7 @@
 import { 
     GET_ORGS_LOADING, GET_ORGS_SUCCESS, GET_ORGS_FAILURE,
-    GET_ORG_LOADING, GET_ORG_SUCCESS, GET_ORG_FAILURE 
+    GET_ORG_LOADING, GET_ORG_SUCCESS, GET_ORG_FAILURE,
+    CREATE_ORG_LOADING, CREATE_ORG_SUCCESS, CREATE_ORG_FAILURE 
 } from '../actions/types';
 
 const initialState = {
@@ -9,6 +10,10 @@ const initialState = {
         status: 'NOT_STARTED'
     },
     selectedOrg: {
+        data: {},
+        status: 'NOT_STARTED'
+    },
+    createdOrg: {
         data: {},
         status: 'NOT_STARTED'
     }
@@ -63,6 +68,31 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 selectedOrg: {
+                    data: {},
+                    error: payload,
+                    status: 'FAILURE'
+                }
+            }
+        case CREATE_ORG_LOADING:
+            return {
+                ...state,
+                createdOrg: {
+                    data: {},
+                    status: 'LOADING'
+                }
+            }
+        case CREATE_ORG_SUCCESS:
+            return {
+                ...state,
+                createdOrg: {
+                    data: payload,
+                    status: 'SUCCESS'
+                }
+            }
+        case CREATE_ORG_FAILURE:
+            return {
+                ...state,
+                createdOrg: {
                     data: {},
                     error: payload,
                     status: 'FAILURE'

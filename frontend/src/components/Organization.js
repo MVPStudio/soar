@@ -7,6 +7,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
 
 import { getOrganization } from '../redux/actions/organization';
 
@@ -19,6 +20,9 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
+    divider: {
+        margin: theme.spacing(2)
+    }
 }));
 
 const Organization = (props) => {
@@ -33,12 +37,11 @@ const Organization = (props) => {
         <Fragment>
             <CssBaseline />
             <Container className={classes.root} maxWidth="sm">
-                <Typography component="div">
-                    <Paper className={classes.paper}>
-                        <div>{props.organization.name}</div>
-                        <div>{props.organization._id}</div>
-                    </Paper>
-                </Typography>
+                <Paper className={classes.paper}>
+                    <Typography variant="h4">{props.organization.name}</Typography>
+                    <Divider className={classes.divider} />
+                    <Typography>{props.organization._id}</Typography>
+                </Paper>
             </Container>
         </Fragment>
     )

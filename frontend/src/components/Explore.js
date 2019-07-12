@@ -1,16 +1,23 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { array, bool } from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-// import Typography from '@material-ui/core/Typography';
+import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import Modal from '@material-ui/core/Modal';
+import Divider from '@material-ui/core/Divider';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 
-import { getOrganizations } from '../redux/actions/organization';
+import { getOrganizations, createOrganization } from '../redux/actions/organization';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -21,34 +28,108 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
+    fab: {
+        position: 'fixed',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+    },
+    modalContainer: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: `translate(-50%, -50%)`,
+        outline: 'none'
+    },
+    divider: {
+        margin: theme.spacing(2)
+    },
+    textField: {
+        width: '85%'
+    },
+    button: {
+        margin: theme.spacing(1),
+    },
 }));
 
 const Explore = (props) => {
     const classes = useStyles();
+    const [isModalOpen, setModal] = useState(false);
+    const [values, setValues] = React.useState({
+        name: ''
+    });
+    
+    const handleChange = name => event => {
+        setValues({ ...values, [name]: event.target.value });
+    };
     
     useEffect(() => {
         props.getOrganizations();
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const getOrgGridItems = () => {
+    const renderOrgGridItems = () => {
         return props.organizations.map(org => (
-            <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                    <Link to={`/org/${org._id}`}>{org.name}</Link>
-                </Paper>
+            <Grid item key={org._id} xs={12}>
+                <Link 
+                    component={RouterLink} 
+                    to={`/org/${org._id}`} 
+                    underline="none"
+                >
+                    <Paper className={classes.paper}>
+                        {org.name}
+                    </Paper>
+                </Link>
             </Grid>
         ))
     }
 
     return (
-        <Fragment>
+        <div className={classes.root}>
             <CssBaseline />
-            <Container className={classes.root} maxWidth="sm">
-                <Grid container spacing={3}>
-                    {getOrgGridItems()}
-                </Grid>
+            <Container maxWidth="sm">
+                <Typography component="div">
+                    <Grid container spacing={3}>
+                        {renderOrgGridItems()}
+                    </Grid>
+                </Typography>
             </Container>
-        </Fragment>
+            <Fab 
+                color="primary" 
+                className={classes.fab} 
+                onClick={() => setModal(true)}
+            >
+                <AddIcon />
+            </Fab>
+            <Modal 
+                open={isModalOpen}
+                onBackdropClick={() => setModal(false)}
+            >
+                <Container maxWidth="sm" className={classes.modalContainer}>
+                    <Paper className={classes.paper}>
+                        <Typography variant="h6">Register an Organization</Typography>
+                        <Divider className={classes.divider} />
+                        <TextField
+                            label="Name"
+                            className={classes.textField}
+                            value={values.name}
+                            onChange={handleChange('name')}
+                            margin="normal"
+                            variant="outlined"
+                        />
+                        <Button 
+                            variant="contained" 
+                            color="primary" 
+                            className={classes.button}
+                            onClick={() => props.createOrganization({ name: values.name })}
+                        >
+                            Submit
+                        </Button>
+                        <Button className={classes.button} onClick={() => setModal(false)}>
+                            Cancel
+                        </Button>
+                    </Paper>
+                </Container>
+            </Modal>
+        </div>
     )
 }
 
@@ -64,4 +145,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, { getOrganizations })(Explore)
+export default connect(mapStateToProps, { getOrganizations, createOrganization })(Explore)

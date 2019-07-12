@@ -3,6 +3,16 @@ const router = express.Router();
 
 const Organization = require('../models/Organization');
 
+router.get('/', (req, res) => {
+    Organization.find({})
+    .then(orgs => res.status(200).json(orgs))
+})
+
+router.get('/:id', (req, res) => {
+    Organization.findOne({ _id: req.params.id })
+    .then(org => res.status(200).json(org))
+})
+
 router.post('/create', (req, res) => {
     Organization.findOne({
         name: req.body.name
@@ -21,15 +31,5 @@ router.post('/create', (req, res) => {
         }
     })
 });
-
-router.get('/all', (req, res) => {
-    Organization.find({})
-    .then(orgs => res.status(200).json(orgs))
-})
-
-router.get('/:id', (req, res) => {
-    Organization.findOne({ _id: req.params.id })
-    .then(org => res.status(200).json(org))
-})
 
 module.exports = router;
