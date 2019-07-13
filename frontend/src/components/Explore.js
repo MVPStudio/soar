@@ -15,15 +15,23 @@ import AddIcon from '@material-ui/icons/Add';
 import Modal from '@material-ui/core/Modal';
 
 import CreateOrgForm from './forms/CreateOrg';
-import { getOrganizations, createOrganization } from '../redux/actions/organization';
+import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
 
 const Explore = (props) => {
     const classes = useStyles();
     const [isModalOpen, setModal] = useState(false);
     
+    
     useEffect(() => {
         props.getOrganizations();
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // When the EditOrgForm redirects here after a delete, reset deletedOrg prop
+    useEffect(() => {
+        if (props.orgIsDeleted) {
+            props.resetDeleteOrganization();
+        }
+    }, [props.orgIsDeleted]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const renderOrgGridItems = () => {
         return props.organizations.map(org => (
@@ -107,7 +115,8 @@ Explore.propTypes = {
     organizations: array.isRequired,
     createdOrg: object.isRequired,
     orgsLoaded: bool.isRequired,
-    orgIsCreated: bool.isRequired
+    orgIsCreated: bool.isRequired,
+    orgIsDeleted: bool.isRequired
 }
 
 Explore.defaultProps = {
@@ -119,8 +128,15 @@ const mapStateToProps = (state) => {
         organizations: state.organization.allOrgs.data,
         createdOrg: state.organization.createdOrg.data,
         orgsLoaded: state.organization.allOrgs.status === 'SUCCESS',
-        orgIsCreated: state.organization.createdOrg.status === 'SUCCESS'
+        orgIsCreated: state.organization.createdOrg.status === 'SUCCESS',
+        orgIsDeleted: state.organization.deletedOrg.status === 'SUCCESS'
     }
 }
 
-export default connect(mapStateToProps, { getOrganizations, createOrganization } )(Explore)
+const mapDispatchToProps = {
+    getOrganizations, 
+    createOrganization, 
+    resetDeleteOrganization
+}
+
+export default connect(mapStateToProps, mapDispatchToProps )(Explore)

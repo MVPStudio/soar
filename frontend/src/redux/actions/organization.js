@@ -3,7 +3,8 @@ import {
     GET_ORGS_LOADING, GET_ORGS_SUCCESS, GET_ORGS_FAILURE,
     GET_ORG_LOADING, GET_ORG_SUCCESS, GET_ORG_FAILURE,
     CREATE_ORG_LOADING, CREATE_ORG_SUCCESS, CREATE_ORG_FAILURE, CREATE_ORG_RESET,
-    EDIT_ORG_LOADING, EDIT_ORG_SUCCESS, EDIT_ORG_FAILURE, EDIT_ORG_RESET
+    EDIT_ORG_LOADING, EDIT_ORG_SUCCESS, EDIT_ORG_FAILURE, EDIT_ORG_RESET,
+    DELETE_ORG_LOADING, DELETE_ORG_SUCCESS, DELETE_ORG_FAILURE, DELETE_ORG_RESET
 } from './types';
 
 export const getOrganizations = () => dispatch => {
@@ -63,7 +64,7 @@ export const createOrganization = org => dispatch => {
 export const editOrganization = (orgId, updates) => dispatch => {
     dispatch({ type: EDIT_ORG_LOADING });
 
-    axios.post(`/api/organizations/edit/${orgId}`, { ...updates })
+    axios.put(`/api/organizations/${orgId}`, { ...updates })
         .then(res => {
             dispatch({
                 type: EDIT_ORG_SUCCESS,
@@ -78,10 +79,29 @@ export const editOrganization = (orgId, updates) => dispatch => {
         });
 }
 
+export const deleteOrganization = orgId => dispatch => {
+    dispatch({ type: DELETE_ORG_LOADING });
+
+    axios.delete(`/api/organizations/${orgId}`)
+        .then(() => {
+            dispatch({ type: DELETE_ORG_SUCCESS });
+        })
+        .catch(err => {
+            dispatch({
+                type: DELETE_ORG_FAILURE,
+                payload: err.response.data
+            });
+        });
+}
+
 export const resetCreateOrganization = () => dispatch => {
     dispatch({ type: CREATE_ORG_RESET });
 }
 
 export const resetEditOrganization = () => dispatch => {
     dispatch({ type: EDIT_ORG_RESET });
+}
+
+export const resetDeleteOrganization = () => dispatch => {
+    dispatch({ type: DELETE_ORG_RESET });
 }

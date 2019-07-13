@@ -9,8 +9,8 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import Fab from '@material-ui/core/Fab';
-// import Icon from '@material-ui/core/Icon';
 import Modal from '@material-ui/core/Modal';
+import SvgIcon from '@material-ui/core/SvgIcon';
 
 import EditOrgForm from './forms/EditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
@@ -39,6 +39,12 @@ const Organization = (props) => {
         }
     }, [props.orgIsEdited]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    const getEditIconSvg = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>	
+    )
+
     return (
         <Fragment>
             <CssBaseline />
@@ -50,12 +56,13 @@ const Organization = (props) => {
                 </Paper>
             </Container>
             <Fab 
-                variant="extended"
                 color="primary" 
                 className={classes.fab} 
                 onClick={() => setModal(true)}
             >
-                Edit
+                <SvgIcon>
+                    {getEditIconSvg()}
+                </SvgIcon>
             </Fab>
             <Modal 
                 open={isModalOpen}

@@ -16,9 +16,7 @@ router.post('/register', (req, res) => {
         return res.status(400).json(errors);
     }
 
-    User.findOne({
-            email: req.body.email
-        })
+    User.findOne({ email: req.body.email })
         .then(user => {
             if (user) {
                 return res.status(400).json({
@@ -38,8 +36,7 @@ router.post('/register', (req, res) => {
                             if (err) console.error('There was an error', err);
                             else {
                                 newUser.password = hash;
-                                newUser
-                                    .save()
+                                newUser.save()
                                     .then(user => {
                                         res.status(201).json(user)
                                     });

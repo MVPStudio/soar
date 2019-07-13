@@ -17,7 +17,7 @@ router.post('/create', (req, res) => {
     Organization.findOne({ name: req.body.name })
         .then(org => {
             if (org) {
-                return res.status(400).json({
+                return res.status(409).json({
                     name: 'Organization with this name already exists'
                 });
             } else {
@@ -26,19 +26,28 @@ router.post('/create', (req, res) => {
                 })
 
                 newOrg.save()
-                .then(org => res.status(201).json(org))
+                    .then(org => res.status(201).json(org))
+                    .catch(err => res.status(400).json(err))
             }
         })
 });
 
-router.post('/edit/:id', (req, res) => {
-    Organization.findOneAndUpdate({ _id: req.params.id }, { $set: req.body }, (err, updatedOrg) => {
-        if (err) {
-            return res.status(500).json(err);
-        }
-        return res.status(200).json(updatedOrg);
-    })
+router.put('/:id', (req, res) => {
+    Organization.findOneAndUpdate({ _id: req.params.id }, { $set: req.body }, { new: true, runValidators: true })
+        .then(updatedOrg => res.status(200).json(updatedOrg))
+        .catch(err => {
+            const isValidationError = err.name === 'ValidationError';
+            return res.status(isValidationError ? 400 : 500).json(err);
+        })
+});
 
+router.delete('/:id', (req, res) => {
+    Organization.findOneAndDelete({ _id: req.params.id })
+        .then(deletedOrg => {
+            if (deletedOrg) res.status(204).end();
+            else res.status(404).end();
+        })
+        .catch(err => res.status(500).json(err));
 });
 
 module.exports = router;
