@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
 
 const Schema = mongoose.Schema;
 
@@ -32,12 +33,8 @@ const OrganizationSchema = new Schema({
     adminIds: {
         type: Array,
         default: []
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
     }
-});
+}, { timestamps: true });
 
 const Organization = mongoose.model('organizations', OrganizationSchema);
 

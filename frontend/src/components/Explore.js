@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { array, bool } from 'prop-types';
+import { array, bool, object } from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,54 +13,13 @@ import Link from '@material-ui/core/Link';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Modal from '@material-ui/core/Modal';
-import Divider from '@material-ui/core/Divider';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 
+import CreateOrgForm from './forms/CreateOrg';
 import { getOrganizations, createOrganization } from '../redux/actions/organization';
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        marginTop: theme.spacing(4),
-    },
-    paper: {
-        padding: theme.spacing(2),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-    },
-    fab: {
-        position: 'fixed',
-        bottom: theme.spacing(2),
-        right: theme.spacing(2),
-    },
-    modalContainer: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: `translate(-50%, -50%)`,
-        outline: 'none'
-    },
-    divider: {
-        margin: theme.spacing(2)
-    },
-    textField: {
-        width: '85%'
-    },
-    button: {
-        margin: theme.spacing(1),
-    },
-}));
 
 const Explore = (props) => {
     const classes = useStyles();
     const [isModalOpen, setModal] = useState(false);
-    const [values, setValues] = React.useState({
-        name: ''
-    });
-    
-    const handleChange = name => event => {
-        setValues({ ...values, [name]: event.target.value });
-    };
     
     useEffect(() => {
         props.getOrganizations();
@@ -83,9 +42,9 @@ const Explore = (props) => {
     }
 
     return (
-        <div className={classes.root}>
+        <Fragment>
             <CssBaseline />
-            <Container maxWidth="sm">
+            <Container className={classes.root} maxWidth="sm">
                 <Typography component="div">
                     <Grid container spacing={3}>
                         {renderOrgGridItems()}
@@ -105,44 +64,63 @@ const Explore = (props) => {
             >
                 <Container maxWidth="sm" className={classes.modalContainer}>
                     <Paper className={classes.paper}>
-                        <Typography variant="h6">Register an Organization</Typography>
-                        <Divider className={classes.divider} />
-                        <TextField
-                            label="Name"
-                            className={classes.textField}
-                            value={values.name}
-                            onChange={handleChange('name')}
-                            margin="normal"
-                            variant="outlined"
+                        <CreateOrgForm 
+                            isModal 
+                            setModal={setModal} 
+                            history={props.history} 
                         />
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            className={classes.button}
-                            onClick={() => props.createOrganization({ name: values.name })}
-                        >
-                            Submit
-                        </Button>
-                        <Button className={classes.button} onClick={() => setModal(false)}>
-                            Cancel
-                        </Button>
                     </Paper>
                 </Container>
             </Modal>
-        </div>
+        </Fragment>
     )
 }
 
+const useStyles = makeStyles(theme => ({
+    root: {
+        marginTop: theme.spacing(4),
+    },
+    paper: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+    },
+    fab: {
+        position: 'fixed',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+    },
+    modalContainer: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        outline: 'none'
+    },
+    divider: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2)
+    },
+}));
+
 Explore.propTypes = {
     organizations: array.isRequired,
-    isLoaded: bool.isRequired
+    createdOrg: object.isRequired,
+    orgsLoaded: bool.isRequired,
+    orgIsCreated: bool.isRequired
+}
+
+Explore.defaultProps = {
+    organizations: []
 }
 
 const mapStateToProps = (state) => {
     return {
         organizations: state.organization.allOrgs.data,
-        isLoaded: state.organization.allOrgs.status === 'SUCCESS'
+        createdOrg: state.organization.createdOrg.data,
+        orgsLoaded: state.organization.allOrgs.status === 'SUCCESS',
+        orgIsCreated: state.organization.createdOrg.status === 'SUCCESS'
     }
 }
 
-export default connect(mapStateToProps, { getOrganizations, createOrganization })(Explore)
+export default connect(mapStateToProps, { getOrganizations, createOrganization } )(Explore)
