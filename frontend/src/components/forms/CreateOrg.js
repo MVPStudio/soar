@@ -7,14 +7,30 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import MenuItem from '@material-ui/core/MenuItem';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
 import { getOrganizations, createOrganization } from '../../redux/actions/organization';
+import { categories, states } from './FormValues';
 
 const CreateOrgForm = (props) => {
     const classes = useStyles();
     const [values, setValues] = useState({
-        name: ''
+        name: '',
+        category: '',
+        missionStatement: '',
+        description: '',
+        phoneNumber: '',
+        streetAddress: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        tags: [],
+        website: ''
     });
+    const [selectedTab, setSelectedTab] = useState(0);
 
     useEffect(() => {
         if (props.orgIsCreated) {
@@ -24,7 +40,11 @@ const CreateOrgForm = (props) => {
 
     const handleChange = name => e => {
         setValues({ ...values, [name]: e.target.value });
-    };
+    }
+
+    const handleSelectedTabChange = (event, newValue) => {
+        setSelectedTab(newValue);
+      }
 
     const setModalOnParent = (isOpen) => {
         if (props.isModal) {
@@ -32,10 +52,8 @@ const CreateOrgForm = (props) => {
         }
     }
 
-    return (
+    const renderBasicInfo = () => (
         <Fragment>
-            <Typography variant="h6">Register an Organization</Typography>
-            <Divider className={classes.divider} />
             <TextField
                 label="Name"
                 className={classes.textField}
@@ -45,11 +63,142 @@ const CreateOrgForm = (props) => {
                 variant="outlined"
                 required
             />
+            <TextField
+                select
+                label="Area of Impact"
+                className={classes.textField}
+                value={values.category}
+                onChange={handleChange('category')}
+                margin="normal"
+                variant="outlined"
+                required
+            >
+                {categories.map((category, i) => (
+                    <MenuItem key={`${category}-${i}`} value={category}>
+                        {category}
+                    </MenuItem>
+                ))}
+            </TextField>
+            <TextField
+                label="Website or Social Media Link"
+                className={classes.textField}
+                value={values.website}
+                onChange={handleChange('website')}
+                margin="normal"
+                variant="outlined"
+            />
+        </Fragment>
+    )
+
+    const renderContactInfo = () => (
+        <Fragment>
+            <TextField
+                label="Phone Number"
+                className={classes.textField}
+                value={values.phoneNumber}
+                onChange={handleChange('phoneNumber')}
+                margin="normal"
+                variant="outlined"
+            />
+            <TextField
+                label="Street Address"
+                className={classes.textField}
+                value={values.streetAddress}
+                onChange={handleChange('streetAddress')}
+                margin="normal"
+                variant="outlined"
+            />
+            <TextField
+                label="City"
+                className={classes.textField}
+                value={values.city}
+                onChange={handleChange('city')}
+                margin="normal"
+                variant="outlined"
+            />
+            <TextField
+                select
+                label="State"
+                className={classes.textField}
+                value={values.state}
+                onChange={handleChange('state')}
+                margin="normal"
+                variant="outlined"
+            >
+                {states.map((state, i) => (
+                    <MenuItem key={`${state}-${i}`} value={state}>
+                        {state}
+                    </MenuItem>
+                ))}
+            </TextField>
+            <TextField
+                label="Zip Code"
+                className={classes.textField}
+                value={values.zipCode}
+                onChange={handleChange('zipCode')}
+                margin="normal"
+                variant="outlined"
+            />
+        </Fragment>
+    )
+
+    const renderDetailedInfo = () => (
+        <Fragment>
+            <TextField
+                multiline
+                label="Mission Statement"
+                className={classes.textField}
+                onChange={handleChange('missionStatement')}
+                margin="normal"
+                variant="outlined"
+                rows="4"
+            />
+            <TextField
+                multiline
+                label="About the Organization"
+                className={classes.textField}
+                onChange={handleChange('description')}
+                margin="normal"
+                variant="outlined"
+                rows="4"
+            />
+            <TextField
+                label="Skills desired"
+                className={classes.textField}
+                value={values.tags}
+                onChange={handleChange('tags')}
+                margin="normal"
+                variant="outlined"
+            />
+        </Fragment>
+    )
+
+    return (
+        <Fragment>
+            <Typography variant="h6">Register an Organization</Typography>
+            <Divider className={classes.divider} />
+            <AppBar position="static" className={classes.appBar}>
+                <Tabs 
+                    value={selectedTab} 
+                    onChange={handleSelectedTabChange}
+                    indicatorColor="primary"
+                    textColor="primary" 
+                    centered
+                >
+                    <Tab label="Basics" />
+                    <Tab label="Contact Info" />
+                    <Tab label="Details" />
+                </Tabs>
+            </AppBar>
+            {selectedTab === 0 && renderBasicInfo()}
+            {selectedTab === 1 && renderContactInfo()}
+            {selectedTab === 2 && renderDetailedInfo()}
+            <Divider className={classes.divider} />
             <Button 
                 variant="contained" 
                 color="primary" 
                 className={classes.button}
-                onClick={() => props.createOrganization({ name: values.name })}
+                onClick={() => props.createOrganization({ ...values })}
             >
                 Submit
             </Button>
@@ -74,6 +223,10 @@ const useStyles = makeStyles(theme => ({
     button: {
         margin: theme.spacing(1),
     },
+    appBar: {
+        backgroundColor: '#FFF',
+        boxShadow: 'none'
+    }
 }));
 
 CreateOrgForm.propTypes = {

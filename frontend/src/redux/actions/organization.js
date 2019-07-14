@@ -46,7 +46,7 @@ export const getOrganization = orgId => dispatch => {
 export const createOrganization = org => dispatch => {
     dispatch({ type: CREATE_ORG_LOADING });
 
-    axios.post(`/api/organizations/create/`, { name: org.name })
+    axios.post(`/api/organizations/create/`, { ...org })
         .then(res => {
             dispatch({
                 type: CREATE_ORG_SUCCESS,
