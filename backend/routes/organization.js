@@ -22,7 +22,7 @@ router.post('/create', (req, res) => {
                 });
             } else {
                 const newOrg = new Organization({
-                    name: req.body.name
+                    ...req.body
                 })
 
                 newOrg.save()

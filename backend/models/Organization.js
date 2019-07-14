@@ -11,7 +11,7 @@ const OrganizationSchema = new Schema({
     category: {
         type: String
     },
-    phone: {
+    phoneNumber: {
         type: String
     },
     email: {
@@ -20,10 +20,22 @@ const OrganizationSchema = new Schema({
     website: {
         type: String
     },
-    address: {
+    streetAddress: {
+        type: String
+    },
+    city: {
+        type: String
+    },
+    state: {
+        type: String
+    },
+    zipCode: {
         type: String
     },
     description: {
+        type: String
+    },
+    missionStatement: {
         type: String
     },
     tags: {
