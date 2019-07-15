@@ -1,6 +1,8 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { bool, object, func } from 'prop-types';
+import { bool, object, func, number, string, shape } from 'prop-types';
+import deburr from 'lodash/deburr';
+import Downshift from 'downshift';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -11,12 +13,53 @@ import MenuItem from '@material-ui/core/MenuItem';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Popper from '@material-ui/core/Popper';
+import Paper from '@material-ui/core/Paper';
+import Chip from '@material-ui/core/Chip';
 
 import { getOrganizations, createOrganization } from '../../redux/actions/organization';
 import { categories, states } from './FormValues';
 
+const suggestions = [
+    { label: 'Afghanistan' },
+    { label: 'Aland Islands' },
+    { label: 'Albania' },
+    { label: 'Algeria' },
+    { label: 'American Samoa' },
+    { label: 'Andorra' },
+    { label: 'Angola' },
+    { label: 'Anguilla' },
+    { label: 'Antarctica' },
+    { label: 'Antigua and Barbuda' },
+    { label: 'Argentina' },
+    { label: 'Armenia' },
+    { label: 'Aruba' },
+    { label: 'Australia' },
+    { label: 'Austria' },
+    { label: 'Azerbaijan' },
+    { label: 'Bahamas' },
+    { label: 'Bahrain' },
+    { label: 'Bangladesh' },
+    { label: 'Barbados' },
+    { label: 'Belarus' },
+    { label: 'Belgium' },
+    { label: 'Belize' },
+    { label: 'Benin' },
+    { label: 'Bermuda' },
+    { label: 'Bhutan' },
+    { label: 'Bolivia, Plurinational State of' },
+    { label: 'Bonaire, Sint Eustatius and Saba' },
+    { label: 'Bosnia and Herzegovina' },
+    { label: 'Botswana' },
+    { label: 'Bouvet Island' },
+    { label: 'Brazil' },
+    { label: 'British Indian Ocean Territory' },
+    { label: 'Brunei Darussalam' },
+];
+
 const CreateOrgForm = (props) => {
     const classes = useStyles();
+    const [selectedTab, setSelectedTab] = useState(0);
     const [values, setValues] = useState({
         name: '',
         category: '',
@@ -30,7 +73,6 @@ const CreateOrgForm = (props) => {
         tags: [],
         website: ''
     });
-    const [selectedTab, setSelectedTab] = useState(0);
 
     useEffect(() => {
         if (props.orgIsCreated) {
@@ -44,12 +86,81 @@ const CreateOrgForm = (props) => {
 
     const handleSelectedTabChange = (event, newValue) => {
         setSelectedTab(newValue);
-      }
+    }
 
     const setModalOnParent = (isOpen) => {
         if (props.isModal) {
             props.setModal(isOpen);
         }
+    }
+
+    const renderTagsInput = (inputProps) => {
+        const { InputProps, classes, ref, ...other } = inputProps;
+
+        return (
+            <TextField
+                variant="outlined"
+                className={classes.textField}
+                margin="normal"
+                InputProps={{
+                    inputRef: ref,
+                    // classes: {
+                    //     root: classes.inputRoot,
+                    //     input: classes.inputInput,
+                    // },
+                    ...InputProps,
+                }}
+                {...other}
+            />
+        );
+    }
+
+    function renderTagsSuggestion(suggestionProps) {
+        const { suggestion, index, itemProps, highlightedIndex, selectedItem } = suggestionProps;
+        const isHighlighted = highlightedIndex === index;
+        const isSelected = (selectedItem || '').indexOf(suggestion.label) > -1;
+
+        return (
+            <MenuItem
+                {...itemProps}
+                key={suggestion.label}
+                selected={isHighlighted}
+                component="div"
+                style={{
+                    fontWeight: isSelected ? 500 : 400,
+                }}
+                onClick={() => { console.log('You chose', suggestion.label) }}
+            >
+                {suggestion.label}
+            </MenuItem>
+        );
+    }
+
+    renderTagsSuggestion.propTypes = {
+        highlightedIndex: number,
+        index: number,
+        itemProps: object,
+        selectedItem: string,
+        suggestion: shape({ label: string }).isRequired,
+    };
+
+    const getTagSuggestions = (value, { showEmpty = false } = {}) => {
+        const inputValue = deburr(value.trim()).toLowerCase();
+        const inputLength = inputValue.length;
+        let count = 0;
+
+        return inputLength === 0 && !showEmpty
+            ? []
+            : suggestions.filter(suggestion => {
+                const keep =
+                    count < 5 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
+
+                if (keep) {
+                    count += 1;
+                }
+
+                return keep;
+            });
     }
 
     const renderBasicInfo = () => (
@@ -71,7 +182,6 @@ const CreateOrgForm = (props) => {
                 onChange={handleChange('category')}
                 margin="normal"
                 variant="outlined"
-                required
             >
                 {categories.map((category, i) => (
                     <MenuItem key={`${category}-${i}`} value={category}>
@@ -87,6 +197,51 @@ const CreateOrgForm = (props) => {
                 margin="normal"
                 variant="outlined"
             />
+            <Downshift>
+                {({
+                    getInputProps,
+                    getItemProps,
+                    getLabelProps,
+                    getMenuProps,
+                    highlightedIndex,
+                    inputValue,
+                    isOpen,
+                    selectedItem,
+                }) => {
+                    const { onBlur, onFocus, ...inputProps } = getInputProps({
+                        placeholder: 'Search for a skill',
+                    });
+
+                    return (
+                        <div className={classes.container}>
+                            {renderTagsInput({
+                                fullWidth: true,
+                                classes,
+                                label: 'Skills Needed',
+                                InputLabelProps: getLabelProps({ shrink: true }),
+                                InputProps: { onBlur, onFocus },
+                                inputProps,
+                            })}
+
+                            <div {...getMenuProps()}>
+                                {isOpen ? (
+                                    <Paper className={classes.dropdownPaper}>
+                                        {getTagSuggestions(inputValue).map((suggestion, index) =>
+                                            renderTagsSuggestion({
+                                                suggestion,
+                                                index,
+                                                itemProps: getItemProps({ item: suggestion.label }),
+                                                highlightedIndex,
+                                                selectedItem,
+                                            }),
+                                        )}
+                                    </Paper>
+                                ) : null}
+                            </div>
+                        </div>
+                    );
+                }}
+            </Downshift>
         </Fragment>
     )
 
@@ -160,15 +315,7 @@ const CreateOrgForm = (props) => {
                 onChange={handleChange('description')}
                 margin="normal"
                 variant="outlined"
-                rows="4"
-            />
-            <TextField
-                label="Skills desired"
-                className={classes.textField}
-                value={values.tags}
-                onChange={handleChange('tags')}
-                margin="normal"
-                variant="outlined"
+                rows="6"
             />
         </Fragment>
     )
@@ -178,11 +325,11 @@ const CreateOrgForm = (props) => {
             <Typography variant="h6">Register an Organization</Typography>
             <Divider className={classes.divider} />
             <AppBar position="static" className={classes.appBar}>
-                <Tabs 
-                    value={selectedTab} 
+                <Tabs
+                    value={selectedTab}
                     onChange={handleSelectedTabChange}
                     indicatorColor="primary"
-                    textColor="primary" 
+                    textColor="primary"
                     centered
                 >
                     <Tab label="Basics" />
@@ -194,16 +341,16 @@ const CreateOrgForm = (props) => {
             {selectedTab === 1 && renderContactInfo()}
             {selectedTab === 2 && renderDetailedInfo()}
             <Divider className={classes.divider} />
-            <Button 
-                variant="contained" 
-                color="primary" 
+            <Button
+                variant="contained"
+                color="primary"
                 className={classes.button}
                 onClick={() => props.createOrganization({ ...values })}
             >
                 Submit
             </Button>
-            <Button 
-                className={classes.button} 
+            <Button
+                className={classes.button}
                 onClick={() => setModalOnParent(false)}
             >
                 Cancel
@@ -226,7 +373,22 @@ const useStyles = makeStyles(theme => ({
     appBar: {
         backgroundColor: '#FFF',
         boxShadow: 'none'
-    }
+    },
+    container: {
+        flexGrow: 1,
+        position: 'relative',
+    },
+    dropdownPaper: {
+        height: '200px',
+        width: '85%',
+        position: 'absolute',
+        overflow: 'auto',
+        zIndex: 1,
+        marginTop: theme.spacing(1),
+        left: 0,
+        right: 0,
+        transform: 'translateX(8.5%)'
+    },
 }));
 
 CreateOrgForm.propTypes = {

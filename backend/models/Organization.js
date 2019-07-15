@@ -9,7 +9,9 @@ const OrganizationSchema = new Schema({
         required: true
     },
     category: {
-        type: String
+        type: String,
+        required: true,
+        default: 'Other'
     },
     phoneNumber: {
         type: String
