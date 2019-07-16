@@ -94,6 +94,20 @@ const CreateOrgForm = (props) => {
         }
     }
 
+    const addTag = (tagToAdd) => {
+        if (!values.tags.includes(tagToAdd)) {
+            const newTags = [ ...values.tags, tagToAdd ];
+            setValues({ ...values, tags: newTags });
+        }
+    }
+
+    const removeTag = (tagToDelete) => {
+        if (values.tags.includes(tagToDelete)) {
+            const newTags = values.tags.filter(tag => tag !== tagToDelete);
+            setValues({ ...values, tags: newTags });
+        }
+    }
+
     const renderTagsInput = (inputProps) => {
         const { InputProps, classes, ref, ...other } = inputProps;
 
@@ -129,7 +143,7 @@ const CreateOrgForm = (props) => {
                 style={{
                     fontWeight: isSelected ? 500 : 400,
                 }}
-                onClick={() => { console.log('You chose', suggestion.label) }}
+                onClick={() => addTag(suggestion.label)}
             >
                 {suggestion.label}
             </MenuItem>
@@ -162,6 +176,67 @@ const CreateOrgForm = (props) => {
                 return keep;
             });
     }
+
+    const renderTagsField = () => (
+        <Downshift>
+            {({
+                getInputProps,
+                getItemProps,
+                getLabelProps,
+                getMenuProps,
+                highlightedIndex,
+                inputValue,
+                isOpen,
+                selectedItem,
+            }) => {
+                const { onBlur, onFocus, ...inputProps } = getInputProps({
+                    placeholder: 'Search for a skill',
+                });
+
+                return (
+                    <div className={classes.container}>
+                        {renderTagsInput({
+                            fullWidth: true,
+                            classes,
+                            label: 'Skills Needed',
+                            InputLabelProps: getLabelProps({ shrink: true }),
+                            InputProps: { onBlur, onFocus },
+                            inputProps,
+                        })}
+
+                        <div {...getMenuProps()}>
+                            {isOpen ? (
+                                <Paper className={classes.dropdownPaper}>
+                                    {getTagSuggestions(inputValue).map((suggestion, index) =>
+                                        renderTagsSuggestion({
+                                            index,
+                                            suggestion,
+                                            itemProps: getItemProps({ item: suggestion.label }),
+                                            highlightedIndex,
+                                            selectedItem,
+                                        }),
+                                    )}
+                                </Paper>
+                            ) : null}
+                        </div>
+                    </div>
+                );
+            }}
+        </Downshift>
+    )
+
+    const renderTags = () => (
+        <div className={classes.chipContainer}>
+            {values.tags.map((tag, i) => (
+                <Chip
+                    label={tag}
+                    key={`${tag}-${i}`}
+                    onDelete={() => removeTag(tag)}
+                    className={classes.chip}
+                />
+            ))}
+        </div>
+    )
 
     const renderBasicInfo = () => (
         <Fragment>
@@ -197,51 +272,6 @@ const CreateOrgForm = (props) => {
                 margin="normal"
                 variant="outlined"
             />
-            <Downshift>
-                {({
-                    getInputProps,
-                    getItemProps,
-                    getLabelProps,
-                    getMenuProps,
-                    highlightedIndex,
-                    inputValue,
-                    isOpen,
-                    selectedItem,
-                }) => {
-                    const { onBlur, onFocus, ...inputProps } = getInputProps({
-                        placeholder: 'Search for a skill',
-                    });
-
-                    return (
-                        <div className={classes.container}>
-                            {renderTagsInput({
-                                fullWidth: true,
-                                classes,
-                                label: 'Skills Needed',
-                                InputLabelProps: getLabelProps({ shrink: true }),
-                                InputProps: { onBlur, onFocus },
-                                inputProps,
-                            })}
-
-                            <div {...getMenuProps()}>
-                                {isOpen ? (
-                                    <Paper className={classes.dropdownPaper}>
-                                        {getTagSuggestions(inputValue).map((suggestion, index) =>
-                                            renderTagsSuggestion({
-                                                suggestion,
-                                                index,
-                                                itemProps: getItemProps({ item: suggestion.label }),
-                                                highlightedIndex,
-                                                selectedItem,
-                                            }),
-                                        )}
-                                    </Paper>
-                                ) : null}
-                            </div>
-                        </div>
-                    );
-                }}
-            </Downshift>
         </Fragment>
     )
 
@@ -315,8 +345,12 @@ const CreateOrgForm = (props) => {
                 onChange={handleChange('description')}
                 margin="normal"
                 variant="outlined"
-                rows="6"
+                rows="4"
             />
+            <div>
+                {renderTagsField()}
+                {renderTags()}
+            </div>
         </Fragment>
     )
 
@@ -383,12 +417,21 @@ const useStyles = makeStyles(theme => ({
         width: '85%',
         position: 'absolute',
         overflow: 'auto',
-        zIndex: 1,
+        zIndex: 2,
         marginTop: theme.spacing(1),
         left: 0,
         right: 0,
-        transform: 'translateX(8.5%)'
+        transform: 'translateX(8.85%)'
     },
+    chip: {
+        margin: theme.spacing(1),
+    },
+    chipContainer: {
+        width: '85%',
+        maxHeight: '100px',
+        overflow: 'auto',
+        margin: 'auto'
+    }
 }));
 
 CreateOrgForm.propTypes = {
