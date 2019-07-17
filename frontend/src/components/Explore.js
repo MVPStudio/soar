@@ -14,7 +14,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Modal from '@material-ui/core/Modal';
 
-import CreateOrgForm from './forms/CreateOrg';
+import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
 
 const Explore = (props) => {
@@ -26,7 +26,7 @@ const Explore = (props) => {
         props.getOrganizations();
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // When the EditOrgForm redirects here after a delete, reset deletedOrg prop
+    // When the CreateEditOrgForm redirects here after a delete, reset deletedOrg prop
     useEffect(() => {
         if (props.orgIsDeleted) {
             props.resetDeleteOrganization();
@@ -72,7 +72,7 @@ const Explore = (props) => {
             >
                 <Container maxWidth="sm" className={classes.modalContainer}>
                     <Paper className={classes.paper}>
-                        <CreateOrgForm 
+                        <CreateEditOrgForm 
                             isModal 
                             setModal={setModal} 
                             history={props.history} 

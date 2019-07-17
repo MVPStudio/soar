@@ -12,7 +12,7 @@ import Fab from '@material-ui/core/Fab';
 import Modal from '@material-ui/core/Modal';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-import EditOrgForm from './forms/EditOrg';
+import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
 
 const Organization = (props) => {
@@ -24,7 +24,7 @@ const Organization = (props) => {
         props.getOrganization(orgId);
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // When the CreateOrgForm redirects here, reset createdOrg prop
+    // When the CreateEditOrgForm redirects here, reset createdOrg prop
     useEffect(() => {
         if (props.orgIsCreated) {
             props.resetCreateOrganization();
@@ -70,11 +70,11 @@ const Organization = (props) => {
             >
                 <Container maxWidth="sm" className={classes.modalContainer}>
                     <Paper className={classes.paper}>
-                        <EditOrgForm
+                        <CreateEditOrgForm
+                            editing
                             isModal 
                             setModal={setModal} 
                             history={props.history} 
-                            organization={props.organization}
                         />
                     </Paper>
                 </Container>

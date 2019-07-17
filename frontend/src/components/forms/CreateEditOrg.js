@@ -13,11 +13,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Popper from '@material-ui/core/Popper';
+import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
+import Modal from '@material-ui/core/Modal';
+import Container from '@material-ui/core/Container';
 
-import { getOrganizations, createOrganization } from '../../redux/actions/organization';
+import { getOrganizations, createOrganization, editOrganization, deleteOrganization } from '../../redux/actions/organization';
 import { categories, states } from './FormValues';
 
 const suggestions = [
@@ -57,21 +60,36 @@ const suggestions = [
     { label: 'Brunei Darussalam' },
 ];
 
-const CreateOrgForm = (props) => {
+const emptyState = {
+    name: '',
+    category: '',
+    missionStatement: '',
+    description: '',
+    phoneNumber: '',
+    streetAddress: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    tags: [],
+    website: ''
+}
+
+const CreateEditOrgForm = (props) => {
     const classes = useStyles();
     const [selectedTab, setSelectedTab] = useState(0);
-    const [values, setValues] = useState({
-        name: '',
-        category: '',
-        missionStatement: '',
-        description: '',
-        phoneNumber: '',
-        streetAddress: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        tags: [],
-        website: ''
+    const [isDeleteModalOpen, setDeleteModal] = useState(false);
+    const [values, setValues] = useState(!props.editing ? emptyState : {
+        name: props.selectedOrg.name || '',
+        category: props.selectedOrg.category || '',
+        missionStatement: props.selectedOrg.missionStatement || '',
+        description: props.selectedOrg.description || '',
+        phoneNumber: props.selectedOrg.phoneNumber || '',
+        streetAddress: props.selectedOrg.streetAddress || '',
+        city: props.selectedOrg.city || '',
+        state: props.selectedOrg.state || '',
+        zipCode: props.selectedOrg.zipCode || '',
+        tags: props.selectedOrg.tags || [],
+        website: props.selectedOrg.website || ''
     });
 
     useEffect(() => {
@@ -79,6 +97,12 @@ const CreateOrgForm = (props) => {
             props.history.push(`/org/${props.createdOrg._id}`);
         }
     }, [props.orgIsCreated]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (props.orgIsDeleted) {
+            props.history.push(`/explore`);
+        }
+    }, [props.orgIsDeleted]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleChange = name => e => {
         setValues({ ...values, [name]: e.target.value });
@@ -108,6 +132,14 @@ const CreateOrgForm = (props) => {
         }
     }
 
+    const handleCreateOrEdit = () => {
+        if (props.editing) {
+            props.editOrganization(props.selectedOrg._id, { ...values });
+        } else {
+            props.createOrganization({ ...values });
+        }
+    }
+
     const renderTagsInput = (inputProps) => {
         const { InputProps, classes, ref, ...other } = inputProps;
 
@@ -118,10 +150,6 @@ const CreateOrgForm = (props) => {
                 margin="normal"
                 InputProps={{
                     inputRef: ref,
-                    // classes: {
-                    //     root: classes.inputRoot,
-                    //     input: classes.inputInput,
-                    // },
                     ...InputProps,
                 }}
                 {...other}
@@ -166,12 +194,8 @@ const CreateOrgForm = (props) => {
         return inputLength === 0 && !showEmpty
             ? []
             : suggestions.filter(suggestion => {
-                const keep =
-                    count < 5 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
-
-                if (keep) {
-                    count += 1;
-                }
+                const keep = count < 5 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
+                if (keep) count += 1;
 
                 return keep;
             });
@@ -264,14 +288,10 @@ const CreateOrgForm = (props) => {
                     </MenuItem>
                 ))}
             </TextField>
-            <TextField
-                label="Website or Social Media Link"
-                className={classes.textField}
-                value={values.website}
-                onChange={handleChange('website')}
-                margin="normal"
-                variant="outlined"
-            />
+            <div>
+                {renderTagsField()}
+                {renderTags()}
+            </div>
         </Fragment>
     )
 
@@ -293,34 +313,44 @@ const CreateOrgForm = (props) => {
                 margin="normal"
                 variant="outlined"
             />
+            <div className={classes.textFieldContainer}>
+                <TextField
+                    label="City"
+                    className={classes.city}
+                    value={values.city}
+                    onChange={handleChange('city')}
+                    margin="normal"
+                    variant="outlined"
+                />
+                <TextField
+                    select
+                    label="State"
+                    className={classes.state}
+                    value={values.state}
+                    onChange={handleChange('state')}
+                    margin="normal"
+                    variant="outlined"
+                >
+                    {states.map((state, i) => (
+                        <MenuItem key={`${state}-${i}`} value={state}>
+                            {state}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                <TextField
+                    label="Zip Code"
+                    className={classes.zipCode}
+                    value={values.zipCode}
+                    onChange={handleChange('zipCode')}
+                    margin="normal"
+                    variant="outlined"
+                />
+            </div>
             <TextField
-                label="City"
+                label="Website or Social Media Link"
                 className={classes.textField}
-                value={values.city}
-                onChange={handleChange('city')}
-                margin="normal"
-                variant="outlined"
-            />
-            <TextField
-                select
-                label="State"
-                className={classes.textField}
-                value={values.state}
-                onChange={handleChange('state')}
-                margin="normal"
-                variant="outlined"
-            >
-                {states.map((state, i) => (
-                    <MenuItem key={`${state}-${i}`} value={state}>
-                        {state}
-                    </MenuItem>
-                ))}
-            </TextField>
-            <TextField
-                label="Zip Code"
-                className={classes.textField}
-                value={values.zipCode}
-                onChange={handleChange('zipCode')}
+                value={values.website}
+                onChange={handleChange('website')}
                 margin="normal"
                 variant="outlined"
             />
@@ -333,6 +363,7 @@ const CreateOrgForm = (props) => {
                 multiline
                 label="Mission Statement"
                 className={classes.textField}
+                value={values.missionStatement}
                 onChange={handleChange('missionStatement')}
                 margin="normal"
                 variant="outlined"
@@ -342,21 +373,31 @@ const CreateOrgForm = (props) => {
                 multiline
                 label="About the Organization"
                 className={classes.textField}
+                value={values.description}
                 onChange={handleChange('description')}
                 margin="normal"
                 variant="outlined"
-                rows="4"
+                rows="6"
             />
-            <div>
-                {renderTagsField()}
-                {renderTags()}
-            </div>
         </Fragment>
     )
 
     return (
         <Fragment>
-            <Typography variant="h6">Register an Organization</Typography>
+            <div className={classes.header}>
+                <Typography variant="h6">
+                    {`${props.editing ? 'Edit' : 'Register an'} Organization`}
+                </Typography>
+                {   
+                    props.editing &&
+                    <IconButton 
+                        className={classes.deleteIcon} 
+                        onClick={() => setDeleteModal(true)}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                }
+            </div>
             <Divider className={classes.divider} />
             <AppBar position="static" className={classes.appBar}>
                 <Tabs
@@ -379,7 +420,7 @@ const CreateOrgForm = (props) => {
                 variant="contained"
                 color="primary"
                 className={classes.button}
-                onClick={() => props.createOrganization({ ...values })}
+                onClick={handleCreateOrEdit}
             >
                 Submit
             </Button>
@@ -389,17 +430,85 @@ const CreateOrgForm = (props) => {
             >
                 Cancel
             </Button>
+            {
+                props.editing &&
+                <Modal 
+                    open={isDeleteModalOpen}
+                    onBackdropClick={() => setDeleteModal(false)}
+                >
+                    <Container maxWidth="xs" className={classes.modalContainer}>
+                        <Paper className={classes.paper}>
+                            <DeleteOrgDialog 
+                                selectedOrg={props.selectedOrg} 
+                                setDeleteModal={setDeleteModal}
+                                deleteOrganization={props.deleteOrganization}
+                            />
+                        </Paper>
+                    </Container>
+                </Modal>
+            }
         </Fragment>
     )
 }
 
+const DeleteOrgDialog = (props) => {
+    const classes = useStyles();
+
+    return (
+        <Fragment>
+            <Typography variant="h6">Delete Organization</Typography>
+            <Divider className={classes.divider} />
+            <Typography component="div">
+                <div className={classes.deleteAreYouSure}>
+                    {`Are you sure you want to delete ${props.selectedOrg.name}?`}
+                </div>
+                <b>This cannot be undone.</b>
+            </Typography>
+            <Divider className={classes.divider} />
+            <Button 
+                variant="contained" 
+                color="secondary" 
+                className={classes.button}
+                onClick={() => props.deleteOrganization(props.selectedOrg._id)}
+            >
+                Delete
+            </Button>
+            <Button 
+                className={classes.button} 
+                onClick={() => props.setDeleteModal(false)}
+            >
+                Cancel
+            </Button>
+        </Fragment>
+    );
+}
+
 const useStyles = makeStyles(theme => ({
+    header: {
+        position: 'relative'
+    },
     divider: {
         marginTop: theme.spacing(2),
         marginBottom: theme.spacing(2)
     },
     textField: {
         width: '85%'
+    },
+    textFieldContainer: {
+        display: 'flex',
+        width: '85%',
+        margin: 'auto', 
+    },
+    city: {
+        flex: 1
+    },
+    state: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: '80px'
+    },
+    zipCode: {
+        width: '90px'
     },
     button: {
         margin: theme.spacing(1),
@@ -431,10 +540,33 @@ const useStyles = makeStyles(theme => ({
         maxHeight: '100px',
         overflow: 'auto',
         margin: 'auto'
-    }
+    },
+    deleteIcon: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        transform: 'translateY(-17.5%)'
+    },
+    deleteAreYouSure: {
+        width: '85%',
+        margin: 'auto',
+        marginBottom: '0.5rem'
+    },
+    modalContainer: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        outline: 'none'
+    },
+    paper: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+    },
 }));
 
-CreateOrgForm.propTypes = {
+CreateEditOrgForm.propTypes = {
     createdOrg: object.isRequired,
     orgIsCreated: bool.isRequired,
     isModal: bool,
@@ -444,8 +576,18 @@ CreateOrgForm.propTypes = {
 const mapStateToProps = (state) => {
     return {
         createdOrg: state.organization.createdOrg.data,
-        orgIsCreated: state.organization.createdOrg.status === 'SUCCESS'
+        selectedOrg: state.organization.selectedOrg.data,
+        orgIsCreated: state.organization.createdOrg.status === 'SUCCESS',
+        orgIsEdited: state.organization.editedOrg.status === 'SUCCESS',
+        orgIsDeleted: state.organization.deletedOrg.status === 'SUCCESS'
     }
 }
 
-export default connect(mapStateToProps, { getOrganizations, createOrganization })(CreateOrgForm)
+const mapDispatchToProps = {
+    getOrganizations, 
+    createOrganization,
+    editOrganization, 
+    deleteOrganization
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateEditOrgForm)
