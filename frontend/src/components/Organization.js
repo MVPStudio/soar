@@ -11,6 +11,11 @@ import Divider from '@material-ui/core/Divider';
 import Fab from '@material-ui/core/Fab';
 import Modal from '@material-ui/core/Modal';
 import SvgIcon from '@material-ui/core/SvgIcon';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import InboxIcon from '@material-ui/icons/Inbox';
 
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
@@ -41,8 +46,8 @@ const Organization = (props) => {
 
     const getEditIconSvg = () => (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-        </svg>	
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+        </svg>
     )
 
     return (
@@ -51,20 +56,28 @@ const Organization = (props) => {
             <Container className={classes.root} maxWidth="sm">
                 <Paper className={classes.paper}>
                     <Typography variant="h4">{props.organization.name}</Typography>
-                    <Divider className={classes.divider} />
-                    <Typography>{props.organization._id}</Typography>
+                    {
+                        props.organization.missionStatement !== '' &&
+                        <Fragment>
+                            <Divider className={classes.divider} />
+                            <Typography align="justify">{props.organization.missionStatement}</Typography>
+                        </Fragment>
+                    }
+                </Paper>
+                <Paper className={classes.paper}>
+                    <ContactInfo org={props.organization} />
                 </Paper>
             </Container>
-            <Fab 
-                color="primary" 
-                className={classes.fab} 
+            <Fab
+                color="primary"
+                className={classes.fab}
                 onClick={() => setModal(true)}
             >
                 <SvgIcon>
                     {getEditIconSvg()}
                 </SvgIcon>
             </Fab>
-            <Modal 
+            <Modal
                 open={isModalOpen}
                 onBackdropClick={() => setModal(false)}
             >
@@ -72,14 +85,50 @@ const Organization = (props) => {
                     <Paper className={classes.paper}>
                         <CreateEditOrgForm
                             editing
-                            isModal 
-                            setModal={setModal} 
-                            history={props.history} 
+                            isModal
+                            setModal={setModal}
+                            history={props.history}
                         />
                     </Paper>
                 </Container>
             </Modal>
         </Fragment>
+    )
+}
+
+const ContactInfo = ({ org }) => {
+    const classes = useStyles();
+
+    return (
+        <List className={classes.listRoot}>
+            {
+                org.phoneNumber !== '' &&
+                <ListItem>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={org.phoneNumber} />
+                </ListItem>
+            }
+            {
+                org.website !== '' &&
+                <ListItem>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={org.website} />
+                </ListItem>
+            }
+            {
+                (org.streetAddress !== '' || org.city !== '' || org.state !== '' || org.zipCode !== '') &&
+                <ListItem>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`${org.streetAddress}, ${org.city}, ${org.state} ${org.zipCode}`} />
+                </ListItem>
+            }
+        </List>
     )
 }
 
@@ -94,6 +143,7 @@ const useStyles = makeStyles(theme => ({
     },
     paper: {
         padding: theme.spacing(2),
+        marginBottom: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
@@ -107,6 +157,11 @@ const useStyles = makeStyles(theme => ({
     divider: {
         marginTop: theme.spacing(2),
         marginBottom: theme.spacing(2)
+    },
+    listRoot: {
+        width: '100%',
+        // maxWidth: 360,
+        backgroundColor: theme.palette.background.paper,
     }
 }));
 
@@ -126,10 +181,10 @@ const mapStateToProps = (state) => {
     }
 }
 
-const mapDispatchToProps = { 
-    getOrganization, 
-    resetCreateOrganization, 
-    resetEditOrganization 
+const mapDispatchToProps = {
+    getOrganization,
+    resetCreateOrganization,
+    resetEditOrganization
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Organization)
