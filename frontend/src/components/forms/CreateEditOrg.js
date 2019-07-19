@@ -63,14 +63,14 @@ const suggestions = [
 const emptyState = {
     name: '',
     category: '',
-    missionStatement: '',
     description: '',
+    tags: [],
+    email: '',
     phoneNumber: '',
     streetAddress: '',
     city: '',
     state: '',
     zipCode: '',
-    tags: [],
     website: ''
 }
 
@@ -79,17 +79,17 @@ const CreateEditOrgForm = (props) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const [isDeleteModalOpen, setDeleteModal] = useState(false);
     const [values, setValues] = useState(!props.editing ? emptyState : {
-        name: props.selectedOrg.name || '',
-        category: props.selectedOrg.category || '',
-        missionStatement: props.selectedOrg.missionStatement || '',
-        description: props.selectedOrg.description || '',
-        phoneNumber: props.selectedOrg.phoneNumber || '',
-        streetAddress: props.selectedOrg.streetAddress || '',
-        city: props.selectedOrg.city || '',
-        state: props.selectedOrg.state || '',
-        zipCode: props.selectedOrg.zipCode || '',
-        tags: props.selectedOrg.tags || [],
-        website: props.selectedOrg.website || ''
+        name: props.selectedOrg.name,
+        category: props.selectedOrg.category,
+        description: props.selectedOrg.description,
+        tags: props.selectedOrg.tags,
+        email: props.selectedOrg.email,
+        phoneNumber: props.selectedOrg.phoneNumber,
+        streetAddress: props.selectedOrg.streetAddress,
+        city: props.selectedOrg.city,
+        state: props.selectedOrg.state,
+        zipCode: props.selectedOrg.zipCode,
+        website: props.selectedOrg.website
     });
 
     useEffect(() => {
@@ -214,7 +214,7 @@ const CreateEditOrgForm = (props) => {
                 selectedItem,
             }) => {
                 const { onBlur, onFocus, ...inputProps } = getInputProps({
-                    placeholder: 'Search for a skill',
+                    placeholder: 'Search for an action',
                 });
 
                 return (
@@ -222,7 +222,7 @@ const CreateEditOrgForm = (props) => {
                         {renderTagsInput({
                             fullWidth: true,
                             classes,
-                            label: 'Skills Needed',
+                            label: 'Actions',
                             InputLabelProps: getLabelProps({ shrink: true }),
                             InputProps: { onBlur, onFocus },
                             inputProps,
@@ -275,7 +275,7 @@ const CreateEditOrgForm = (props) => {
             />
             <TextField
                 select
-                label="Area of Impact"
+                label="Category"
                 className={classes.textField}
                 value={values.category}
                 onChange={handleChange('category')}
@@ -297,14 +297,6 @@ const CreateEditOrgForm = (props) => {
 
     const renderContactInfo = () => (
         <Fragment>
-            <TextField
-                label="Phone Number"
-                className={classes.textField}
-                value={values.phoneNumber}
-                onChange={handleChange('phoneNumber')}
-                margin="normal"
-                variant="outlined"
-            />
             <TextField
                 label="Street Address"
                 className={classes.textField}
@@ -347,6 +339,22 @@ const CreateEditOrgForm = (props) => {
                 />
             </div>
             <TextField
+                label="Phone Number"
+                className={classes.textField}
+                value={values.phoneNumber}
+                onChange={handleChange('phoneNumber')}
+                margin="normal"
+                variant="outlined"
+            />
+            <TextField
+                label="Email"
+                className={classes.textField}
+                value={values.email}
+                onChange={handleChange('email')}
+                margin="normal"
+                variant="outlined"
+            />
+            <TextField
                 label="Website or Social Media Link"
                 className={classes.textField}
                 value={values.website}
@@ -361,23 +369,13 @@ const CreateEditOrgForm = (props) => {
         <Fragment>
             <TextField
                 multiline
-                label="Mission Statement"
-                className={classes.textField}
-                value={values.missionStatement}
-                onChange={handleChange('missionStatement')}
-                margin="normal"
-                variant="outlined"
-                rows="4"
-            />
-            <TextField
-                multiline
                 label="About the Organization"
                 className={classes.textField}
                 value={values.description}
                 onChange={handleChange('description')}
                 margin="normal"
                 variant="outlined"
-                rows="6"
+                rows="10"
             />
         </Fragment>
     )

@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { object, bool } from 'prop-types';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
@@ -16,6 +16,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/Inbox';
+import Badge from '@material-ui/core/Badge';
+import Chip from '@material-ui/core/Chip';
 
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
@@ -50,23 +52,43 @@ const Organization = (props) => {
         </svg>
     )
 
+    const StyledBadge = withStyles(() => ({
+        badge: {
+            transform: 'translate(15%, -25%)'
+        },
+    }))(Badge);
+
     return (
         <Fragment>
             <CssBaseline />
             <Container className={classes.root} maxWidth="sm">
-                <Paper className={classes.paper}>
-                    <Typography variant="h4">{props.organization.name}</Typography>
-                    {
-                        props.organization.missionStatement !== '' &&
-                        <Fragment>
-                            <Divider className={classes.divider} />
-                            <Typography align="justify">{props.organization.missionStatement}</Typography>
-                        </Fragment>
-                    }
-                </Paper>
+                <StyledBadge badgeContent={props.organization.category} color="primary">
+                    <Paper className={classes.paper}>
+                        <Typography variant="h4">{props.organization.name}</Typography>
+                        {
+                            props.organization.description !== '' &&
+                            <Fragment>
+                                <Divider className={classes.divider} />
+                                <Typography align="justify" className={classes.orgDescription}>
+                                    {props.organization.description}
+                                </Typography>
+                            </Fragment>
+                        }
+                    </Paper>
+                </StyledBadge>
                 <Paper className={classes.paper}>
                     <ContactInfo org={props.organization} />
                 </Paper>
+                {
+                    props.organization.tags && 
+                    <Paper className={classes.paper}>
+                        {
+                            props.organization.tags.map(tag => (
+                                <Chip label={tag} className={classes.chip} />
+                            ))
+                        }
+                    </Paper>
+                }
             </Container>
             <Fab
                 color="primary"
@@ -98,34 +120,75 @@ const Organization = (props) => {
 
 const ContactInfo = ({ org }) => {
     const classes = useStyles();
+    const { streetAddress, city, state, zipCode, phoneNumber, email, website } = org;
+    const isEmpty = (string) => { return string === '' }
+
+    const atLeastOneAddressValueExists = !isEmpty(streetAddress) || !isEmpty(city) || !isEmpty(state) || !isEmpty(zipCode);
+    const noAddressValuesExist = isEmpty(streetAddress) && isEmpty(city) && isEmpty(state) && isEmpty(zipCode);
+    const noValuesExist = noAddressValuesExist && isEmpty(phoneNumber) && isEmpty(email) && isEmpty(website);
+
+    if (noValuesExist) {
+        return (
+            <List className={classes.listRoot}>
+                <Typography variant="p">No contact information yet!</Typography>
+            </List>
+        )
+    }
 
     return (
         <List className={classes.listRoot}>
             {
-                org.phoneNumber !== '' &&
-                <ListItem>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={org.phoneNumber} />
-                </ListItem>
+                atLeastOneAddressValueExists &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <InboxIcon />
+                        </ListItemIcon>
+                        <ListItemText>
+                            <div>{streetAddress}</div>
+                            <div>
+                                {!isEmpty(city) && city}
+                                {!isEmpty(city) && !isEmpty(state) && `, `}
+                                {!isEmpty(state) && state}
+                                {!isEmpty(state) && !isEmpty(zipCode) && ` `}
+                                {!isEmpty(zipCode) && zipCode}
+                            </div>
+                        </ListItemText>
+                    </ListItem>
+                    <Divider />
+                </Fragment>
             }
             {
-                org.website !== '' &&
-                <ListItem>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={org.website} />
-                </ListItem>
+                !isEmpty(phoneNumber) &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <InboxIcon />
+                        </ListItemIcon>
+                        <ListItemText>{phoneNumber}</ListItemText>
+                    </ListItem>
+                    <Divider />
+                </Fragment>
             }
             {
-                (org.streetAddress !== '' || org.city !== '' || org.state !== '' || org.zipCode !== '') &&
+                !isEmpty(website) &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <InboxIcon />
+                        </ListItemIcon>
+                        <ListItemText>{website}</ListItemText>
+                    </ListItem>
+                    <Divider />
+                </Fragment>
+            }
+            {
+                !isEmpty(email) &&
                 <ListItem>
                     <ListItemIcon>
                         <InboxIcon />
                     </ListItemIcon>
-                    <ListItemText primary={`${org.streetAddress}, ${org.city}, ${org.state} ${org.zipCode}`} />
+                    <ListItemText>{email}</ListItemText>
                 </ListItem>
             }
         </List>
@@ -142,6 +205,7 @@ const useStyles = makeStyles(theme => ({
         right: theme.spacing(2),
     },
     paper: {
+        width: '100%',
         padding: theme.spacing(2),
         marginBottom: theme.spacing(2),
         textAlign: 'center',
@@ -160,8 +224,13 @@ const useStyles = makeStyles(theme => ({
     },
     listRoot: {
         width: '100%',
-        // maxWidth: 360,
         backgroundColor: theme.palette.background.paper,
+    },
+    orgDescription: {
+        whiteSpace: 'pre-line'
+    },
+    chip: {
+        margin: theme.spacing(1),
     }
 }));
 

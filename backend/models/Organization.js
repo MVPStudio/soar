@@ -10,43 +10,43 @@ const OrganizationSchema = new Schema({
     },
     category: {
         type: String,
-        required: true,
         default: 'Other'
     },
-    phoneNumber: {
-        type: String
-    },
-    email: {
-        type: String
-    },
-    website: {
-        type: String
-    },
-    streetAddress: {
-        type: String
-    },
-    city: {
-        type: String
-    },
-    state: {
-        type: String
-    },
-    zipCode: {
-        type: String
-    },
     description: {
-        type: String
-    },
-    missionStatement: {
-        type: String
+        type: String,
+        default: ''
     },
     tags: {
         type: Array,
         default: []
     },
-    adminIds: {
-        type: Array,
-        default: []
+    phoneNumber: {
+        type: String,
+        default: ''
+    },
+    email: {
+        type: String,
+        default: ''
+    },
+    website: {
+        type: String,
+        default: ''
+    },
+    streetAddress: {
+        type: String,
+        default: ''
+    },
+    city: {
+        type: String,
+        default: ''
+    },
+    state: {
+        type: String,
+        default: ''
+    },
+    zipCode: {
+        type: String,
+        default: ''
     }
 }, { timestamps: true });
 
