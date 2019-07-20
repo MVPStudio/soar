@@ -15,7 +15,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/Inbox';
+import { Home, Phone, Link, EmailOutlined } from '@material-ui/icons';
 import Badge from '@material-ui/core/Badge';
 import Chip from '@material-ui/core/Chip';
 
@@ -54,8 +54,13 @@ const Organization = (props) => {
 
     const StyledBadge = withStyles(() => ({
         badge: {
-            transform: 'translate(15%, -25%)'
+            left: 0,
+            right: 'initial',
+            transform: 'translate(-10%, -25%)'
         },
+        root: {
+            width: '100%'
+        }
     }))(Badge);
 
     return (
@@ -80,11 +85,12 @@ const Organization = (props) => {
                     <ContactInfo org={props.organization} />
                 </Paper>
                 {
-                    props.organization.tags && 
+                    props.organization.tags &&
                     <Paper className={classes.paper}>
+                        <Chip label={props.organization.tags.length ? 'Actions:' : 'No actions yet'} className={classes.chip} variant="outlined" />
                         {
-                            props.organization.tags.map(tag => (
-                                <Chip label={tag} className={classes.chip} />
+                            props.organization.tags.map((tag, i) => (
+                                <Chip key={`${tag}-${i}`} label={tag} className={classes.chip} />
                             ))
                         }
                     </Paper>
@@ -130,7 +136,7 @@ const ContactInfo = ({ org }) => {
     if (noValuesExist) {
         return (
             <List className={classes.listRoot}>
-                <Typography variant="p">No contact information yet!</Typography>
+                <Typography className={classes.italic}>No contact information yet</Typography>
             </List>
         )
     }
@@ -142,7 +148,7 @@ const ContactInfo = ({ org }) => {
                 <Fragment>
                     <ListItem>
                         <ListItemIcon>
-                            <InboxIcon />
+                            <Home />
                         </ListItemIcon>
                         <ListItemText>
                             <div>{streetAddress}</div>
@@ -155,7 +161,7 @@ const ContactInfo = ({ org }) => {
                             </div>
                         </ListItemText>
                     </ListItem>
-                    <Divider />
+                    {(!isEmpty(phoneNumber) || !isEmpty(website) || !isEmpty(email)) && <Divider />}
                 </Fragment>
             }
             {
@@ -163,11 +169,23 @@ const ContactInfo = ({ org }) => {
                 <Fragment>
                     <ListItem>
                         <ListItemIcon>
-                            <InboxIcon />
+                            <Phone />
                         </ListItemIcon>
                         <ListItemText>{phoneNumber}</ListItemText>
                     </ListItem>
-                    <Divider />
+                    {(!isEmpty(email) || !isEmpty(website)) && <Divider />}
+                </Fragment>
+            }
+            {
+                !isEmpty(email) &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <EmailOutlined />
+                        </ListItemIcon>
+                        <ListItemText>{email}</ListItemText>
+                    </ListItem>
+                    {!isEmpty(website) && <Divider />}
                 </Fragment>
             }
             {
@@ -175,21 +193,11 @@ const ContactInfo = ({ org }) => {
                 <Fragment>
                     <ListItem>
                         <ListItemIcon>
-                            <InboxIcon />
+                            <Link />
                         </ListItemIcon>
                         <ListItemText>{website}</ListItemText>
                     </ListItem>
-                    <Divider />
                 </Fragment>
-            }
-            {
-                !isEmpty(email) &&
-                <ListItem>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText>{email}</ListItemText>
-                </ListItem>
             }
         </List>
     )
@@ -231,6 +239,9 @@ const useStyles = makeStyles(theme => ({
     },
     chip: {
         margin: theme.spacing(1),
+    },
+    italic: {
+        fontStyle: 'italic'
     }
 }));
 

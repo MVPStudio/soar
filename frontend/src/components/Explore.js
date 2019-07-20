@@ -13,6 +13,7 @@ import Link from '@material-ui/core/Link';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Modal from '@material-ui/core/Modal';
+import InputBase from '@material-ui/core/InputBase';
 
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
@@ -33,8 +34,23 @@ const Explore = (props) => {
         }
     }, [props.orgIsDeleted]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const renderOrgGridItems = () => {
-        return props.organizations.map(org => (
+    const renderSearchField = () => (
+        <Grid item xs={12}>
+            <Paper className={classes.paper}>
+                <InputBase
+                    fullWidth
+                    type="search"
+                    placeholder="Search Organizations"
+                    inputProps={{
+                        style: { textAlign: "center" }
+                    }}
+                />
+            </Paper>
+        </Grid>
+    )
+
+    const renderOrgGridItems = () => (
+        props.organizations.map(org => (
             <Grid item key={org._id} xs={12}>
                 <Link 
                     component={RouterLink} 
@@ -47,7 +63,7 @@ const Explore = (props) => {
                 </Link>
             </Grid>
         ))
-    }
+    )
 
     return (
         <Fragment>
@@ -55,6 +71,7 @@ const Explore = (props) => {
             <Container className={classes.root} maxWidth="sm">
                 <Typography component="div">
                     <Grid container spacing={3}>
+                        {renderSearchField()}
                         {renderOrgGridItems()}
                     </Grid>
                 </Typography>

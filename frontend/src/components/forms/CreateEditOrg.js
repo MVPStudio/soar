@@ -62,7 +62,7 @@ const suggestions = [
 
 const emptyState = {
     name: '',
-    category: '',
+    category: undefined,
     description: '',
     tags: [],
     email: '',
@@ -277,7 +277,7 @@ const CreateEditOrgForm = (props) => {
                 select
                 label="Category"
                 className={classes.textField}
-                value={values.category}
+                value={values.category || ''}
                 onChange={handleChange('category')}
                 margin="normal"
                 variant="outlined"
