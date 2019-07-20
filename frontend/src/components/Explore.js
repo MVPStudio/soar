@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { array, bool, object } from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
+import Fuse from 'fuse.js';
 
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -18,14 +19,42 @@ import InputBase from '@material-ui/core/InputBase';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
 
+const FUSE_SEARCH_KEYS = [
+    {
+        name: 'name',
+        weight: 0.99
+    },
+    {
+        name: 'tags',
+        weight: 0.5
+    },
+    {
+        name: 'description',
+        weight: 0.5
+    },
+]
+
 const Explore = (props) => {
     const classes = useStyles();
+    
     const [isModalOpen, setModal] = useState(false);
-    
-    
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+
     useEffect(() => {
         props.getOrganizations();
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        const options = {
+            keys: FUSE_SEARCH_KEYS
+        };
+
+        const fuse = new Fuse(props.organizations, options)
+        const results = fuse.search(searchTerm);
+
+        setSearchResults(results)
+    }, [searchTerm]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // When the CreateEditOrgForm redirects here after a delete, reset deletedOrg prop
     useEffect(() => {
@@ -41,6 +70,8 @@ const Explore = (props) => {
                     fullWidth
                     type="search"
                     placeholder="Search Organizations"
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={searchTerm}
                     inputProps={{
                         style: { textAlign: "center" }
                     }}
@@ -50,11 +81,11 @@ const Explore = (props) => {
     )
 
     const renderOrgGridItems = () => (
-        props.organizations.map(org => (
+        (searchTerm.length ? searchResults : props.organizations).map(org => (
             <Grid item key={org._id} xs={12}>
-                <Link 
-                    component={RouterLink} 
-                    to={`/org/${org._id}`} 
+                <Link
+                    component={RouterLink}
+                    to={`/org/${org._id}`}
                     underline="none"
                 >
                     <Paper className={classes.paper}>
@@ -76,23 +107,23 @@ const Explore = (props) => {
                     </Grid>
                 </Typography>
             </Container>
-            <Fab 
-                color="primary" 
-                className={classes.fab} 
+            <Fab
+                color="primary"
+                className={classes.fab}
                 onClick={() => setModal(true)}
             >
                 <AddIcon />
             </Fab>
-            <Modal 
+            <Modal
                 open={isModalOpen}
                 onBackdropClick={() => setModal(false)}
             >
                 <Container maxWidth="sm" className={classes.modalContainer}>
                     <Paper className={classes.paper}>
-                        <CreateEditOrgForm 
-                            isModal 
-                            setModal={setModal} 
-                            history={props.history} 
+                        <CreateEditOrgForm
+                            isModal
+                            setModal={setModal}
+                            history={props.history}
                         />
                     </Paper>
                 </Container>
@@ -151,9 +182,9 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-    getOrganizations, 
-    createOrganization, 
+    getOrganizations,
+    createOrganization,
     resetDeleteOrganization
 }
 
-export default connect(mapStateToProps, mapDispatchToProps )(Explore)
+export default connect(mapStateToProps, mapDispatchToProps)(Explore)
