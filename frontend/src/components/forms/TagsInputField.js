@@ -76,7 +76,7 @@ const TagsInputField = (props) => {
         }
     }, [props.tags.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const handleStateChange = (changes, downshiftState) => {
+    const handleStateChange = (changes) => {
         if (changes.hasOwnProperty('isOpen')) {
             setSuggestionMenuOpen(changes.isOpen)
         }
@@ -84,7 +84,6 @@ const TagsInputField = (props) => {
 
     const handleMenuItemClick = (suggestionLabel) => {
         props.addTag(suggestionLabel)
-
     }
 
     const renderTagsInput = (inputProps) => {
@@ -95,6 +94,7 @@ const TagsInputField = (props) => {
                 variant="outlined"
                 className={classes.textField}
                 margin="normal"
+                disabled={!suggestions.length}
                 InputProps={{
                     inputRef: tagsInputFieldRef,
                     ...InputProps,
@@ -160,7 +160,7 @@ const TagsInputField = (props) => {
                 selectedItem,
             }) => {
                 const { onBlur, onFocus, ...inputProps } = getInputProps({
-                    placeholder: 'Search for an action',
+                    placeholder: suggestions.length ? 'Search for an action' : 'Loading actions...',
                 });
 
                 const unusedSuggestions = getTagSuggestions(inputValue).filter(suggestion => {
