@@ -1,8 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { bool, object, func, number, string, shape } from 'prop-types';
-import deburr from 'lodash/deburr';
-import Downshift from 'downshift';
+import { bool, object, func } from 'prop-types';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -20,45 +18,9 @@ import Chip from '@material-ui/core/Chip';
 import Modal from '@material-ui/core/Modal';
 import Container from '@material-ui/core/Container';
 
+import TagsInputField from './TagsInputField';
 import { getOrganizations, createOrganization, editOrganization, deleteOrganization } from '../../redux/actions/organization';
 import { categories, states } from './FormValues';
-
-const suggestions = [
-    { label: 'Afghanistan' },
-    { label: 'Aland Islands' },
-    { label: 'Albania' },
-    { label: 'Algeria' },
-    { label: 'American Samoa' },
-    { label: 'Andorra' },
-    { label: 'Angola' },
-    { label: 'Anguilla' },
-    { label: 'Antarctica' },
-    { label: 'Antigua and Barbuda' },
-    { label: 'Argentina' },
-    { label: 'Armenia' },
-    { label: 'Aruba' },
-    { label: 'Australia' },
-    { label: 'Austria' },
-    { label: 'Azerbaijan' },
-    { label: 'Bahamas' },
-    { label: 'Bahrain' },
-    { label: 'Bangladesh' },
-    { label: 'Barbados' },
-    { label: 'Belarus' },
-    { label: 'Belgium' },
-    { label: 'Belize' },
-    { label: 'Benin' },
-    { label: 'Bermuda' },
-    { label: 'Bhutan' },
-    { label: 'Bolivia, Plurinational State of' },
-    { label: 'Bonaire, Sint Eustatius and Saba' },
-    { label: 'Bosnia and Herzegovina' },
-    { label: 'Botswana' },
-    { label: 'Bouvet Island' },
-    { label: 'Brazil' },
-    { label: 'British Indian Ocean Territory' },
-    { label: 'Brunei Darussalam' },
-];
 
 const emptyState = {
     name: '',
@@ -140,115 +102,6 @@ const CreateEditOrgForm = (props) => {
         }
     }
 
-    const renderTagsInput = (inputProps) => {
-        const { InputProps, classes, ref, ...other } = inputProps;
-
-        return (
-            <TextField
-                variant="outlined"
-                className={classes.textField}
-                margin="normal"
-                InputProps={{
-                    inputRef: ref,
-                    ...InputProps,
-                }}
-                {...other}
-            />
-        );
-    }
-
-    function renderTagsSuggestion(suggestionProps) {
-        const { suggestion, index, itemProps, highlightedIndex, selectedItem } = suggestionProps;
-        const isHighlighted = highlightedIndex === index;
-        const isSelected = (selectedItem || '').indexOf(suggestion.label) > -1;
-
-        return (
-            <MenuItem
-                {...itemProps}
-                key={suggestion.label}
-                selected={isHighlighted}
-                component="div"
-                style={{
-                    fontWeight: isSelected ? 500 : 400,
-                }}
-                onClick={() => addTag(suggestion.label)}
-            >
-                {suggestion.label}
-            </MenuItem>
-        );
-    }
-
-    renderTagsSuggestion.propTypes = {
-        highlightedIndex: number,
-        index: number,
-        itemProps: object,
-        selectedItem: string,
-        suggestion: shape({ label: string }).isRequired,
-    };
-
-    const getTagSuggestions = (value, { showEmpty = false } = {}) => {
-        const inputValue = deburr(value.trim()).toLowerCase();
-        const inputLength = inputValue.length;
-        let count = 0;
-
-        return inputLength === 0 && !showEmpty
-            ? []
-            : suggestions.filter(suggestion => {
-                const keep = count < 5 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
-                if (keep) count += 1;
-
-                return keep;
-            });
-    }
-
-    const renderTagsField = () => (
-        <Downshift>
-            {({
-                getInputProps,
-                getItemProps,
-                getLabelProps,
-                getMenuProps,
-                highlightedIndex,
-                inputValue,
-                isOpen,
-                selectedItem,
-            }) => {
-                const { onBlur, onFocus, ...inputProps } = getInputProps({
-                    placeholder: 'Search for an action',
-                });
-
-                return (
-                    <div className={classes.container}>
-                        {renderTagsInput({
-                            fullWidth: true,
-                            classes,
-                            label: 'Actions',
-                            InputLabelProps: getLabelProps({ shrink: true }),
-                            InputProps: { onBlur, onFocus },
-                            inputProps,
-                        })}
-
-                        <div {...getMenuProps()}>
-                            {isOpen ? (
-                                <Paper className={classes.dropdownPaper}>
-                                    {getTagSuggestions(inputValue).map((suggestion, index) =>
-                                        renderTagsSuggestion({
-                                            index,
-                                            suggestion,
-                                            itemProps: getItemProps({ item: suggestion.label }),
-                                            highlightedIndex,
-                                            selectedItem,
-                                        }),
-                                    )}
-                                </Paper>
-                            ) : null}
-                        </div>
-                    </div>
-                );
-            }}
-        </Downshift>
-    )
-
     const renderTags = () => (
         <div className={classes.chipContainer}>
             {values.tags.map((tag, i) => (
@@ -289,7 +142,7 @@ const CreateEditOrgForm = (props) => {
                 ))}
             </TextField>
             <div>
-                {renderTagsField()}
+                <TagsInputField tags={values.tags} addTag={addTag} />
                 {renderTags()}
             </div>
         </Fragment>
@@ -518,17 +371,6 @@ const useStyles = makeStyles(theme => ({
     container: {
         flexGrow: 1,
         position: 'relative',
-    },
-    dropdownPaper: {
-        height: '200px',
-        width: '85%',
-        position: 'absolute',
-        overflow: 'auto',
-        zIndex: 2,
-        marginTop: theme.spacing(1),
-        left: 0,
-        right: 0,
-        transform: 'translateX(8.85%)'
     },
     chip: {
         margin: theme.spacing(1),
