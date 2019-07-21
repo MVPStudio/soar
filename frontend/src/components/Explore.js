@@ -1,56 +1,53 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { array, bool, object } from 'prop-types';
-import { Link as RouterLink } from 'react-router-dom';
 import Fuse from 'fuse.js';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles  } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Modal from '@material-ui/core/Modal';
 import InputBase from '@material-ui/core/InputBase';
+import Chip from '@material-ui/core/Chip';
 
+import TagsInputField from './forms/TagsInputField';
+import CategorySelect from './forms/CategorySelect';
 import CreateEditOrgForm from './forms/CreateEditOrg';
+import OrganizationTable from './OrganizationTable';
 import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
 
 const FUSE_SEARCH_KEYS = [
     {
-        name: 'name',
-        weight: 0.99
-    },
-    {
-        name: 'tags',
-        weight: 0.5
-    },
-    {
-        name: 'description',
-        weight: 0.5
-    },
+        name: 'name'
+    }
 ]
+
+const FUSE_SEARCH_OPTIONS = {
+    keys: FUSE_SEARCH_KEYS,
+    minMatchCharLength: 3,
+    threshold: 0.3
+};
 
 const Explore = (props) => {
     const classes = useStyles();
-    
+
     const [isModalOpen, setModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [category, setCategory] = useState('');
+    const [tags, setTags] = useState([]);
 
     useEffect(() => {
         props.getOrganizations();
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        const options = {
-            keys: FUSE_SEARCH_KEYS
-        };
-
-        const fuse = new Fuse(props.organizations, options)
+        const fuse = new Fuse(props.organizations, FUSE_SEARCH_OPTIONS)
         const results = fuse.search(searchTerm);
 
         setSearchResults(results)
@@ -63,37 +60,87 @@ const Explore = (props) => {
         }
     }, [props.orgIsDeleted]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    useEffect(() => {
+        if (category === 'All Categories') setCategory('')
+    }, [category]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    const getFilteredOrgs = () => {
+        let filteredOrgs = props.organizations;
+        let filteredSearchResults = searchResults;
+
+        if (category !== '') {
+            filteredOrgs = filteredOrgs.filter(org => org.category === category);
+            filteredSearchResults = filteredSearchResults.filter(org => org.category === category);
+        }
+
+        if (tags.length) {
+            filteredOrgs = filteredOrgs.filter(org => (
+                tags.every(tag => org.tags.includes(tag))
+            ))
+
+            filteredSearchResults = filteredSearchResults.filter(org => (
+                tags.every(tag => org.tags.includes(tag))
+            ))
+        }
+
+        return searchTerm.length ? filteredSearchResults : filteredOrgs;
+    }
+
+    const addTag = (tagToAdd) => {
+        if (!tags.includes(tagToAdd)) {
+            const newTags = [ ...tags, tagToAdd ];
+            setTags(newTags);
+        }
+    }
+
+    const removeTag = (tagToDelete) => {
+        if (tags.includes(tagToDelete)) {
+            const newTags = tags.filter(tag => tag !== tagToDelete);
+            setTags(newTags);
+        }
+    }
+
+    const renderTags = () => (
+        <div className={classes.chipContainer}>
+            {tags.map((tag, i) => (
+                <Chip
+                    label={tag}
+                    key={`${tag}-${i}`}
+                    onDelete={() => removeTag(tag)}
+                    className={classes.chip}
+                />
+            ))}
+        </div>
+    )
+
     const renderSearchField = () => (
         <Grid item xs={12}>
             <Paper className={classes.paper}>
                 <InputBase
                     fullWidth
                     type="search"
-                    placeholder="Search Organizations"
+                    placeholder="Search organizations..."
                     onChange={(e) => setSearchTerm(e.target.value)}
                     value={searchTerm}
-                    inputProps={{
-                        style: { textAlign: "center" }
-                    }}
                 />
             </Paper>
         </Grid>
     )
 
-    const renderOrgGridItems = () => (
-        (searchTerm.length ? searchResults : props.organizations).map(org => (
-            <Grid item key={org._id} xs={12}>
-                <Link
-                    component={RouterLink}
-                    to={`/org/${org._id}`}
-                    underline="none"
-                >
-                    <Paper className={classes.paper}>
-                        {org.name}
-                    </Paper>
-                </Link>
-            </Grid>
-        ))
+    const renderCategoryFilter = () => (
+        <CategorySelect 
+            isFilter
+            selectedCategory={category} 
+            setSelectedCategory={(e) => setCategory(e.target.value)}
+        />
+    )
+
+    const renderTagFilter = () => (
+        <TagsInputField 
+            isFilter
+            tags={tags} 
+            addTag={addTag} 
+        />
     )
 
     return (
@@ -101,10 +148,15 @@ const Explore = (props) => {
             <CssBaseline />
             <Container className={classes.root} maxWidth="sm">
                 <Typography component="div">
-                    <Grid container spacing={3}>
-                        {renderSearchField()}
-                        {renderOrgGridItems()}
+                    {renderSearchField()}
+                    <Grid item xs={12}>
+                        <div className={classes.filtersContainer}>
+                            {renderTagFilter()}
+                            {renderCategoryFilter()}
+                        </div>
+                        {renderTags()}
                     </Grid>
+                    <OrganizationTable orgs={getFilteredOrgs()} />
                 </Typography>
             </Container>
             <Fab
@@ -136,9 +188,11 @@ const useStyles = makeStyles(theme => ({
     root: {
         marginTop: theme.spacing(4),
     },
+    orgLink: {
+        width: '100%',
+    },
     paper: {
         padding: theme.spacing(2),
-        textAlign: 'center',
         color: theme.palette.text.secondary,
     },
     fab: {
@@ -156,6 +210,20 @@ const useStyles = makeStyles(theme => ({
     divider: {
         marginTop: theme.spacing(2),
         marginBottom: theme.spacing(2)
+    },
+    filtersContainer: {
+        display: 'flex',
+        flexFlow: 'row wrap',
+        marginTop: theme.spacing(1),
+    },
+    chip: {
+        margin: theme.spacing(1),
+    },
+    chipContainer: {
+        width: '100%',
+        maxHeight: '100px',
+        overflow: 'auto',
+        margin: 'auto'
     },
 }));
 

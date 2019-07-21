@@ -15,9 +15,10 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Home, Phone, Link, EmailOutlined } from '@material-ui/icons';
+import { Home, Phone, Link as LinkIcon, EmailOutlined } from '@material-ui/icons';
 import Badge from '@material-ui/core/Badge';
 import Chip from '@material-ui/core/Chip';
+import Link from '@material-ui/core/Link';
 
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
@@ -56,7 +57,7 @@ const Organization = (props) => {
         badge: {
             left: 0,
             right: 'initial',
-            transform: 'translate(-10%, -25%)'
+            transform: 'translate(-10%, -30%)'
         },
         root: {
             width: '100%'
@@ -87,7 +88,11 @@ const Organization = (props) => {
                 {
                     props.organization.tags &&
                     <Paper className={classes.paper}>
-                        <Chip label={props.organization.tags.length ? 'Actions:' : 'No actions yet'} className={classes.chip} variant="outlined" />
+                        <Chip 
+                            label={props.organization.tags.length ? 'Actions:' : 'No actions yet'} 
+                            className={classes.chip} 
+                            variant="outlined" 
+                        />
                         {
                             props.organization.tags.map((tag, i) => (
                                 <Chip key={`${tag}-${i}`} label={tag} className={classes.chip} />
@@ -136,7 +141,9 @@ const ContactInfo = ({ org }) => {
     if (noValuesExist) {
         return (
             <List className={classes.listRoot}>
-                <Typography className={classes.italic}>No contact information yet</Typography>
+                <Typography className={classes.italic}>
+                    No contact information yet
+                </Typography>
             </List>
         )
     }
@@ -193,9 +200,17 @@ const ContactInfo = ({ org }) => {
                 <Fragment>
                     <ListItem>
                         <ListItemIcon>
-                            <Link />
+                            <LinkIcon />
                         </ListItemIcon>
-                        <ListItemText>{website}</ListItemText>
+                        <ListItemText>
+                            <Link 
+                                href={website} 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {website}
+                            </Link>
+                        </ListItemText>
                     </ListItem>
                 </Fragment>
             }

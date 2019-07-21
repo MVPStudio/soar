@@ -19,8 +19,10 @@ import Modal from '@material-ui/core/Modal';
 import Container from '@material-ui/core/Container';
 
 import TagsInputField from './TagsInputField';
+import DeleteOrgDialog from './DeleteOrgDialog';
+import CategorySelect from './CategorySelect';
 import { getOrganizations, createOrganization, editOrganization, deleteOrganization } from '../../redux/actions/organization';
-import { categories, states } from './FormValues';
+import { states } from './FormValues';
 
 const emptyState = {
     name: '',
@@ -126,21 +128,10 @@ const CreateEditOrgForm = (props) => {
                 variant="outlined"
                 required
             />
-            <TextField
-                select
-                label="Category"
-                className={classes.textField}
-                value={values.category || ''}
-                onChange={handleChange('category')}
-                margin="normal"
-                variant="outlined"
-            >
-                {categories.map((category, i) => (
-                    <MenuItem key={`${category}-${i}`} value={category}>
-                        {category}
-                    </MenuItem>
-                ))}
-            </TextField>
+            <CategorySelect 
+                selectedCategory={values.category || ''} 
+                setSelectedCategory={handleChange('category')}
+            />
             <div>
                 <TagsInputField tags={values.tags} addTag={addTag} />
                 {renderTags()}
@@ -233,23 +224,25 @@ const CreateEditOrgForm = (props) => {
         </Fragment>
     )
 
-    return (
-        <Fragment>
-            <div className={classes.header}>
-                <Typography variant="h6">
-                    {`${props.editing ? 'Edit' : 'Register an'} Organization`}
-                </Typography>
-                {   
-                    props.editing &&
-                    <IconButton 
-                        className={classes.deleteIcon} 
-                        onClick={() => setDeleteModal(true)}
-                    >
-                        <DeleteIcon />
-                    </IconButton>
-                }
-            </div>
-            <Divider className={classes.divider} />
+    const renderHeader = () => (
+        <div className={classes.header}>
+            <Typography variant="h6">
+                {`${props.editing ? 'Edit' : 'Register an'} Organization`}
+            </Typography>
+            {   
+                props.editing &&
+                <IconButton 
+                    className={classes.deleteIcon} 
+                    onClick={() => setDeleteModal(true)}
+                >
+                    <DeleteIcon />
+                </IconButton>
+            }
+        </div>
+    )
+
+    const renderFormContent = () => (
+        <Container maxWidth="xs">
             <AppBar position="static" className={classes.appBar}>
                 <Tabs
                     value={selectedTab}
@@ -266,7 +259,11 @@ const CreateEditOrgForm = (props) => {
             {selectedTab === 0 && renderBasicInfo()}
             {selectedTab === 1 && renderContactInfo()}
             {selectedTab === 2 && renderDetailedInfo()}
-            <Divider className={classes.divider} />
+        </Container>
+    )
+
+    const renderButtons = () => (
+        <Fragment>
             <Button
                 variant="contained"
                 color="primary"
@@ -281,57 +278,36 @@ const CreateEditOrgForm = (props) => {
             >
                 Cancel
             </Button>
-            {
-                props.editing &&
-                <Modal 
-                    open={isDeleteModalOpen}
-                    onBackdropClick={() => setDeleteModal(false)}
-                >
-                    <Container maxWidth="xs" className={classes.modalContainer}>
-                        <Paper className={classes.paper}>
-                            <DeleteOrgDialog 
-                                selectedOrg={props.selectedOrg} 
-                                setDeleteModal={setDeleteModal}
-                                deleteOrganization={props.deleteOrganization}
-                            />
-                        </Paper>
-                    </Container>
-                </Modal>
-            }
         </Fragment>
     )
-}
 
-const DeleteOrgDialog = (props) => {
-    const classes = useStyles();
+    const renderDeleteModal = () => (
+        <Modal 
+            open={isDeleteModalOpen}
+            onBackdropClick={() => setDeleteModal(false)}
+        >
+            <Container maxWidth="xs" className={classes.modalContainer}>
+                <Paper className={classes.paper}>
+                    <DeleteOrgDialog 
+                        selectedOrg={props.selectedOrg} 
+                        setDeleteModal={setDeleteModal}
+                        deleteOrganization={props.deleteOrganization}
+                    />
+                </Paper>
+            </Container>
+        </Modal>
+    )
 
     return (
         <Fragment>
-            <Typography variant="h6">Delete Organization</Typography>
+            {renderHeader()}
             <Divider className={classes.divider} />
-            <Typography component="div">
-                <div className={classes.deleteAreYouSure}>
-                    {`Are you sure you want to delete ${props.selectedOrg.name}?`}
-                </div>
-                <b>This cannot be undone.</b>
-            </Typography>
+            {renderFormContent()}
             <Divider className={classes.divider} />
-            <Button 
-                variant="contained" 
-                color="secondary" 
-                className={classes.button}
-                onClick={() => props.deleteOrganization(props.selectedOrg._id)}
-            >
-                Delete
-            </Button>
-            <Button 
-                className={classes.button} 
-                onClick={() => props.setDeleteModal(false)}
-            >
-                Cancel
-            </Button>
+            {renderButtons()}
+            {props.editing && renderDeleteModal()}
         </Fragment>
-    );
+    )
 }
 
 const useStyles = makeStyles(theme => ({
@@ -343,11 +319,15 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(2)
     },
     textField: {
-        width: '85%'
+        width: '100%'
+    },
+    selectField: {
+        width: '100%',
+        textAlign: 'left'
     },
     textFieldContainer: {
         display: 'flex',
-        width: '85%',
+        width: '100%',
         margin: 'auto', 
     },
     city: {
@@ -386,11 +366,6 @@ const useStyles = makeStyles(theme => ({
         top: 0,
         right: 0,
         transform: 'translateY(-17.5%)'
-    },
-    deleteAreYouSure: {
-        width: '85%',
-        margin: 'auto',
-        marginBottom: '0.5rem'
     },
     modalContainer: {
         position: 'absolute',

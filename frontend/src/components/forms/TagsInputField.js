@@ -47,20 +47,25 @@ const suggestions = [
 
 const useStyles = makeStyles(theme => ({
     textField: {
-        width: '85%'
+        width: '100%',
+        flex: 1
     },
     container: {
-        flexGrow: 1,
+        flex: 1,
         position: 'relative',
     },
+    containerMarginRight: {
+        flex: 1,
+        position: 'relative',
+        marginRight: '5px'
+    },
     dropdownPaper: {
-        width: '85%',
+        width: '100%',
         position: 'absolute',
         marginTop: theme.spacing(0.5),
-        transform: 'translateX(8.85%)',
         overflow: 'auto',
         zIndex: 2,
-    }
+    },
 }));
 
 const TagsInputField = (props) => {
@@ -168,11 +173,11 @@ const TagsInputField = (props) => {
                 });
 
                 return (
-                    <div className={classes.container}>
+                    <div className={props.isFilter ? classes.containerMarginRight : classes.container}>
                         {renderTagsInput({
                             fullWidth: true,
                             classes,
-                            label: 'Actions',
+                            label: props.isFilter ? 'Action Filter' : 'Actions',
                             InputLabelProps: getLabelProps({ shrink: true }),
                             InputProps: { onBlur, onFocus },
                             inputProps,
