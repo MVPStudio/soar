@@ -33,7 +33,7 @@ const FUSE_SEARCH_OPTIONS = {
     threshold: 0.3
 };
 
-const Explore = (props) => {
+const Search = (props) => {
     const classes = useStyles();
 
     const [isModalOpen, setModal] = useState(false);
@@ -143,43 +143,55 @@ const Explore = (props) => {
         />
     )
 
+    const renderMainContent = () => (
+        <Container className={classes.root} maxWidth="sm">
+            <Typography component="div">
+                {renderSearchField()}
+                <Grid item xs={12}>
+                    <div className={classes.filtersContainer}>
+                        {renderTagFilter()}
+                        {renderCategoryFilter()}
+                    </div>
+                    {renderTags()}
+                </Grid>
+                <OrganizationTable orgs={getFilteredOrgs()} />
+            </Typography>
+        </Container>
+    )
+
+    const renderCreateOrgFab = () => (
+        <Fab
+            color="primary"
+            className={classes.fab}
+            onClick={() => setModal(true)}
+        >
+            <AddIcon />
+        </Fab>
+    )
+
+    const renderCreateOrgModal = () => (
+        <Modal
+            open={isModalOpen}
+            onBackdropClick={() => setModal(false)}
+        >
+            <Container maxWidth="sm" className={classes.modalContainer}>
+                <Paper className={classes.paper}>
+                    <CreateEditOrgForm
+                        isModal
+                        setModal={setModal}
+                        history={props.history}
+                    />
+                </Paper>
+            </Container>
+        </Modal>
+    )
+
     return (
         <Fragment>
             <CssBaseline />
-            <Container className={classes.root} maxWidth="sm">
-                <Typography component="div">
-                    {renderSearchField()}
-                    <Grid item xs={12}>
-                        <div className={classes.filtersContainer}>
-                            {renderTagFilter()}
-                            {renderCategoryFilter()}
-                        </div>
-                        {renderTags()}
-                    </Grid>
-                    <OrganizationTable orgs={getFilteredOrgs()} />
-                </Typography>
-            </Container>
-            <Fab
-                color="primary"
-                className={classes.fab}
-                onClick={() => setModal(true)}
-            >
-                <AddIcon />
-            </Fab>
-            <Modal
-                open={isModalOpen}
-                onBackdropClick={() => setModal(false)}
-            >
-                <Container maxWidth="sm" className={classes.modalContainer}>
-                    <Paper className={classes.paper}>
-                        <CreateEditOrgForm
-                            isModal
-                            setModal={setModal}
-                            history={props.history}
-                        />
-                    </Paper>
-                </Container>
-            </Modal>
+            {renderMainContent()}
+            {renderCreateOrgFab()}
+            {renderCreateOrgModal()}
         </Fragment>
     )
 }
@@ -192,13 +204,17 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
     },
     paper: {
+        width: '100%',
         padding: theme.spacing(2),
+        marginBottom: theme.spacing(2),
+        textAlign: 'center',
         color: theme.palette.text.secondary,
     },
     fab: {
         position: 'fixed',
         bottom: theme.spacing(2),
         right: theme.spacing(2),
+        color: 'white'
     },
     modalContainer: {
         position: 'absolute',
@@ -227,7 +243,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-Explore.propTypes = {
+Search.propTypes = {
     organizations: array.isRequired,
     createdOrg: object.isRequired,
     orgsLoaded: bool.isRequired,
@@ -235,7 +251,7 @@ Explore.propTypes = {
     orgIsDeleted: bool.isRequired
 }
 
-Explore.defaultProps = {
+Search.defaultProps = {
     organizations: []
 }
 
@@ -255,4 +271,4 @@ const mapDispatchToProps = {
     resetDeleteOrganization
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Explore)
+export default connect(mapStateToProps, mapDispatchToProps)(Search)

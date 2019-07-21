@@ -20,9 +20,9 @@ const DeleteOrgDialog = (props) => {
             </Typography>
             <Divider className={classes.divider} />
             <Button 
+                color="primary"
                 variant="contained" 
-                color="secondary" 
-                className={classes.button}
+                className={classes.deleteButton}
                 onClick={() => props.deleteOrganization(props.selectedOrg._id)}
             >
                 Delete
@@ -44,6 +44,10 @@ const useStyles = makeStyles(theme => ({
     },
     button: {
         margin: theme.spacing(1),
+    },
+    deleteButton: {
+        margin: theme.spacing(1),
+        color: 'white',
     },
     deleteAreYouSure: {
         width: '85%',

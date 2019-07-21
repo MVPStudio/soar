@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { object, bool } from 'prop-types';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -19,6 +20,8 @@ import { Home, Phone, Link as LinkIcon, EmailOutlined } from '@material-ui/icons
 import Badge from '@material-ui/core/Badge';
 import Chip from '@material-ui/core/Chip';
 import Link from '@material-ui/core/Link';
+import Button from '@material-ui/core/Button';
+import BackIcon from '@material-ui/icons/KeyboardBackspace';
 
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
@@ -47,84 +50,99 @@ const Organization = (props) => {
         }
     }, [props.orgIsEdited]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const getEditIconSvg = () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-        </svg>
-    )
-
     const StyledBadge = withStyles(() => ({
         badge: {
             left: 0,
             right: 'initial',
-            transform: 'translate(-10%, -30%)'
+            transform: 'translate(-10%, -30%)',
+            color: 'white'
         },
         root: {
             width: '100%'
         }
     }))(Badge);
 
+    const renderMainContent = () => (
+        <Container className={classes.root} maxWidth="sm">
+            <StyledBadge badgeContent={props.organization.category} color="primary">
+                <Paper className={classes.paper}>
+                    <Typography variant="h5">{props.organization.name}</Typography>
+                    {
+                        props.organization.description !== '' &&
+                        <Fragment>
+                            <Divider className={classes.divider} />
+                            <Typography align="justify" className={classes.orgDescription}>
+                                {props.organization.description}
+                            </Typography>
+                        </Fragment>
+                    }
+                </Paper>
+            </StyledBadge>
+            <Paper className={classes.paper}>
+                <ContactInfo org={props.organization} />
+            </Paper>
+            {
+                props.organization.tags &&
+                <Paper className={classes.paper}>
+                    <Chip 
+                        label={props.organization.tags.length ? 'Actions:' : 'No actions yet'} 
+                        className={classes.chip} 
+                        variant="outlined" 
+                    />
+                    {
+                        props.organization.tags.map((tag, i) => (
+                            <Chip key={`${tag}-${i}`} label={tag} className={classes.chip} />
+                        ))
+                    }
+                </Paper>
+            }
+            <div className={classes.backButtonContainer}>
+                <Button variant="outlined" size="small" className={classes.backButton} component={RouterLink} to="/">
+                    <BackIcon className={classes.backIcon} />
+                    Back to search
+                </Button>
+            </div>
+        </Container>
+    )
+
+    const renderEditOrgFab = () => (
+        <Fab
+            color="primary"
+            className={classes.fab}
+            onClick={() => setModal(true)}
+        >
+            <SvgIcon>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                </svg>
+            </SvgIcon>
+        </Fab>
+    )
+
+    const renderEditOrgModal = () => (
+        <Modal
+            open={isModalOpen}
+            onBackdropClick={() => setModal(false)}
+        >
+            <Container maxWidth="sm" className={classes.modalContainer}>
+                <Paper className={classes.paper}>
+                    <CreateEditOrgForm
+                        editing
+                        isModal
+                        setModal={setModal}
+                        history={props.history}
+                    />
+                </Paper>
+            </Container>
+        </Modal>
+    )
+
     return (
         <Fragment>
             <CssBaseline />
-            <Container className={classes.root} maxWidth="sm">
-                <StyledBadge badgeContent={props.organization.category} color="primary">
-                    <Paper className={classes.paper}>
-                        <Typography variant="h4">{props.organization.name}</Typography>
-                        {
-                            props.organization.description !== '' &&
-                            <Fragment>
-                                <Divider className={classes.divider} />
-                                <Typography align="justify" className={classes.orgDescription}>
-                                    {props.organization.description}
-                                </Typography>
-                            </Fragment>
-                        }
-                    </Paper>
-                </StyledBadge>
-                <Paper className={classes.paper}>
-                    <ContactInfo org={props.organization} />
-                </Paper>
-                {
-                    props.organization.tags &&
-                    <Paper className={classes.paper}>
-                        <Chip 
-                            label={props.organization.tags.length ? 'Actions:' : 'No actions yet'} 
-                            className={classes.chip} 
-                            variant="outlined" 
-                        />
-                        {
-                            props.organization.tags.map((tag, i) => (
-                                <Chip key={`${tag}-${i}`} label={tag} className={classes.chip} />
-                            ))
-                        }
-                    </Paper>
-                }
-            </Container>
-            <Fab
-                color="primary"
-                className={classes.fab}
-                onClick={() => setModal(true)}
-            >
-                <SvgIcon>
-                    {getEditIconSvg()}
-                </SvgIcon>
-            </Fab>
-            <Modal
-                open={isModalOpen}
-                onBackdropClick={() => setModal(false)}
-            >
-                <Container maxWidth="sm" className={classes.modalContainer}>
-                    <Paper className={classes.paper}>
-                        <CreateEditOrgForm
-                            editing
-                            isModal
-                            setModal={setModal}
-                            history={props.history}
-                        />
-                    </Paper>
-                </Container>
-            </Modal>
+            {renderMainContent()}
+            {renderEditOrgFab()}
+            {renderEditOrgModal()}
         </Fragment>
     )
 }
@@ -220,12 +238,13 @@ const ContactInfo = ({ org }) => {
 
 const useStyles = makeStyles(theme => ({
     root: {
-        marginTop: theme.spacing(4),
+        marginTop: theme.spacing(4)
     },
     fab: {
         position: 'fixed',
         bottom: theme.spacing(2),
         right: theme.spacing(2),
+        color: 'white'
     },
     paper: {
         width: '100%',
@@ -250,13 +269,25 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: theme.palette.background.paper,
     },
     orgDescription: {
-        whiteSpace: 'pre-line'
+        whiteSpace: 'pre-line',
+        maxHeight: '300px',
+        overflow: 'auto'
     },
     chip: {
         margin: theme.spacing(1),
     },
     italic: {
         fontStyle: 'italic'
+    },
+    backButtonContainer: {
+        margin: 'auto',
+        width: 'max-content'
+    },
+    backButton: {
+        marginTop: theme.spacing(1)
+    },
+    backIcon: {
+        marginRight: theme.spacing(0.5)
     }
 }));
 

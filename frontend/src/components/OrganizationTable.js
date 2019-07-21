@@ -44,7 +44,6 @@ const OrganizationTable = (props) => {
                         <TableRow key={row.name}>
                             <TableCell align="left">
                                 <Link
-                                    className={classes.orgLink}
                                     component={RouterLink}
                                     to={`/org/${row.id}`}
                                 >

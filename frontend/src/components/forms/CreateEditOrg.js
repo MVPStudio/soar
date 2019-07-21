@@ -64,7 +64,7 @@ const CreateEditOrgForm = (props) => {
 
     useEffect(() => {
         if (props.orgIsDeleted) {
-            props.history.push(`/explore`);
+            props.history.push(`/`);
         }
     }, [props.orgIsDeleted]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -267,7 +267,7 @@ const CreateEditOrgForm = (props) => {
             <Button
                 variant="contained"
                 color="primary"
-                className={classes.button}
+                className={classes.submitButton}
                 onClick={handleCreateOrEdit}
             >
                 Submit
@@ -342,7 +342,11 @@ const useStyles = makeStyles(theme => ({
         width: '90px'
     },
     button: {
+        margin: theme.spacing(1)
+    },
+    submitButton: {
         margin: theme.spacing(1),
+        color: 'white'
     },
     appBar: {
         backgroundColor: '#FFF',
@@ -356,7 +360,7 @@ const useStyles = makeStyles(theme => ({
         margin: theme.spacing(1),
     },
     chipContainer: {
-        width: '85%',
+        width: '100%',
         maxHeight: '100px',
         overflow: 'auto',
         margin: 'auto'
