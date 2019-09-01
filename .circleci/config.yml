@@ -11,7 +11,8 @@ jobs:
           root: ./
           # must include anything needed to build/tag/push docker image
           paths:
-            - src
+            - frontend
+            - backend
             - node_modules
             - package.json
             - yarn.lock
