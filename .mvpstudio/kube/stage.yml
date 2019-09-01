@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: mvpstudio/ecan-soar:438e1c1
+        image: mvpstudio/ecan-soar:25563f4
         resources:
            limits:
               cpu: 0.25
@@ -29,6 +29,8 @@ spec:
         ports:
         - containerPort: 3000
         env: 
+        - name: PORT
+          value: '3000'
         - name: NODE_ENV
           value: production
         - name: JWT_SECRET
@@ -47,7 +49,7 @@ spec:
               name: ecan-soar-mongo-credentials
               key: username
         - name: DATABASE_HOST
-          value: ecan-soar-mongodb
+          value: ecan-soar-mongodb/admin
   strategy:
     type: RollingUpdate
     rollingUpdate:

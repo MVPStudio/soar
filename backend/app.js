@@ -28,10 +28,6 @@ app.use(bodyParser.json());
 app.use('/api/users', users);
 app.use('/api/organizations', organizations);
 
-app.get('/', (req, res) => {
-    res.send('hello');
-});
-
 const publicDirectory = path.join(__dirname, '..', 'public');
 app.use(express.static(publicDirectory));
 app.get('*', (_, res) =>
