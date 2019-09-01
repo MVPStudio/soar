@@ -5,7 +5,8 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
-      - run: yarn build
+      - run: cd backend && yarn install --frozen-lockile
+      - run: cd frontend && yarn install --frozen-lockile && yarn build
       - persist_to_workspace:
           root: ./
           # must include anything needed to build/tag/push docker image

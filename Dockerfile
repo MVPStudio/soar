@@ -4,7 +4,8 @@ USER mvp
 WORKDIR /home/mvp/app
 
 # move package to correct location
-COPY . ./
+COPY ./frontend/build ./public
+COPY ./backend ./backend
 
 EXPOSE 3000
-ENTRYPOINT ["node", "./src/node/app.js"]
+ENTRYPOINT ["node", "./backend/app.js"]
