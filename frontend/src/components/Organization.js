@@ -16,7 +16,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Home, Phone, Link as LinkIcon, EmailOutlined } from '@material-ui/icons';
+import { Home, Phone, Link as LinkIcon, EmailOutlined, AvTimer, AccountCircle } from '@material-ui/icons';
 import Badge from '@material-ui/core/Badge';
 import Chip from '@material-ui/core/Chip';
 import Link from '@material-ui/core/Link';
@@ -66,13 +66,13 @@ const Organization = (props) => {
         <Container className={classes.root} maxWidth="sm">
             <StyledBadge badgeContent={props.organization.category} color="primary">
                 <Paper className={classes.paper}>
-                    <Typography variant="h5">{props.organization.name}</Typography>
+                    <Typography variant="h5">{props.organization.Service_Name}</Typography>
                     {
-                        props.organization.description !== '' &&
+                        props.organization.Description_of_Service !== '' &&
                         <Fragment>
                             <Divider className={classes.divider} />
-                            <Typography align="justify" className={classes.orgDescription}>
-                                {props.organization.description}
+                            <Typography align="left" className={classes.orgDescription}>
+                                {props.organization.Description_of_Service}
                             </Typography>
                         </Fragment>
                     }
@@ -80,6 +80,9 @@ const Organization = (props) => {
             </StyledBadge>
             <Paper className={classes.paper}>
                 <ContactInfo org={props.organization} />
+            </Paper>
+            <Paper className={classes.paper}>
+                <ContactInfo useContact org={props.organization} />
             </Paper>
             {
                 props.organization.tags &&
@@ -147,21 +150,85 @@ const Organization = (props) => {
     )
 }
 
-const ContactInfo = ({ org }) => {
+const ContactInfo = ({ org, useContact }) => {
     const classes = useStyles();
-    const { streetAddress, city, state, zipCode, phoneNumber, email, website } = org;
+
+    const { 
+        Physical_Site_Address_1: streetAddress, 
+        Physical_Site_City: city, 
+        Physical_Site_State: state, 
+        Physical_Site_Zip: zipCode, 
+        Contacts_First: contactName,
+        Contacts_Position: contactPosition,
+        Contacts_Phone: contactPhone,
+        Contacts_Email: contactEmail,
+        Main_Phone: phoneNumber, 
+        Fax: faxNumber, 
+        TDD_Phone: tddNumber, 
+        Emergency_After_Hours_Phone: emergencyNumber,
+        Hours_of_Operation: hours,
+        Service_Location_Email: email, 
+        Web_Address: website
+    } = org;
+
     const isEmpty = (string) => { return string === '' }
 
+    const atLeastOnePhoneNumberExists = !isEmpty(phoneNumber) || !isEmpty(faxNumber) || !isEmpty(tddNumber) || !isEmpty(emergencyNumber);
     const atLeastOneAddressValueExists = !isEmpty(streetAddress) || !isEmpty(city) || !isEmpty(state) || !isEmpty(zipCode);
-    const noAddressValuesExist = isEmpty(streetAddress) && isEmpty(city) && isEmpty(state) && isEmpty(zipCode);
-    const noValuesExist = noAddressValuesExist && isEmpty(phoneNumber) && isEmpty(email) && isEmpty(website);
+    const atLeastOneContactValueExists = !isEmpty(contactName) || !isEmpty(contactPosition) || !isEmpty(contactPhone) || !isEmpty(contactEmail);
+    const noValuesExist = !atLeastOneAddressValueExists && !atLeastOnePhoneNumberExists && isEmpty(email) && isEmpty(website);
 
-    if (noValuesExist) {
+    if (noValuesExist || (useContact && !atLeastOneContactValueExists)) {
         return (
             <List className={classes.listRoot}>
                 <Typography className={classes.italic}>
-                    No contact information yet
+                    {`No ${useContact && 'secondary'} contact information`}
                 </Typography>
+            </List>
+        )
+    }
+
+    if (useContact) {
+        return (
+            <List className={classes.listRoot}>
+                {
+                    !isEmpty(contactName) &&
+                    <Fragment>
+                        <ListItem>
+                            <ListItemIcon>
+                                <AccountCircle />
+                            </ListItemIcon>
+                            <ListItemText>
+                                <b>{contactName}</b>
+                                {!isEmpty(contactPosition) && <div>{contactPosition}</div>}
+                            </ListItemText>
+                        </ListItem>
+                        {(!isEmpty(contactPhone) || !isEmpty(contactEmail)) && <Divider />}
+                    </Fragment>
+                }
+                {
+                    !isEmpty(contactPhone) &&
+                    <Fragment>
+                        <ListItem>
+                            <ListItemIcon>
+                                <Phone />
+                            </ListItemIcon>
+                            <ListItemText>{contactPhone}</ListItemText>
+                        </ListItem>
+                        {!isEmpty(contactEmail) && <Divider />}
+                    </Fragment>
+                }
+                {
+                    !isEmpty(contactEmail) &&
+                    <Fragment>
+                        <ListItem>
+                            <ListItemIcon>
+                                <EmailOutlined />
+                            </ListItemIcon>
+                            <ListItemText>{contactEmail}</ListItemText>
+                        </ListItem>
+                    </Fragment>
+                }
             </List>
         )
     }
@@ -186,17 +253,34 @@ const ContactInfo = ({ org }) => {
                             </div>
                         </ListItemText>
                     </ListItem>
-                    {(!isEmpty(phoneNumber) || !isEmpty(website) || !isEmpty(email)) && <Divider />}
+                    {(atLeastOnePhoneNumberExists || !isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
                 </Fragment>
             }
             {
-                !isEmpty(phoneNumber) &&
+                atLeastOnePhoneNumberExists &&
                 <Fragment>
                     <ListItem>
                         <ListItemIcon>
                             <Phone />
                         </ListItemIcon>
-                        <ListItemText>{phoneNumber}</ListItemText>
+                        <ListItemText>
+                            {!isEmpty(phoneNumber) && <div>{`Main: ${phoneNumber}`}</div>}
+                            {!isEmpty(faxNumber) && <div>{`Fax: ${faxNumber}`}</div>}
+                            {!isEmpty(tddNumber) && <div>{`TDD: ${tddNumber}`}</div>}
+                            {!isEmpty(emergencyNumber) && <div>{`Emergency: ${emergencyNumber}`}</div>}
+                        </ListItemText>
+                    </ListItem>
+                    {(!isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
+                </Fragment>
+            }
+            {
+                !isEmpty(hours) &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <AvTimer />
+                        </ListItemIcon>
+                        <ListItemText>{hours}</ListItemText>
                     </ListItem>
                     {(!isEmpty(email) || !isEmpty(website)) && <Divider />}
                 </Fragment>

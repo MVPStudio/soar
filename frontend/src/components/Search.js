@@ -23,7 +23,7 @@ import { getOrganizations, createOrganization, resetDeleteOrganization } from '.
 
 const FUSE_SEARCH_KEYS = [
     {
-        name: 'name'
+        name: 'Service_Name'
     }
 ]
 
