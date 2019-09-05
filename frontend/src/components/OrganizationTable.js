@@ -27,7 +27,7 @@ const OrganizationTable = (props) => {
     const classes = useStyles();
 
     const rows = props.orgs.map(org => (
-        { name: org.name, category: org.category, id: org._id }
+        { name: org.Service_Name, category: org.category, id: org._id }
     ))
 
     return (
