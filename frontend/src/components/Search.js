@@ -9,21 +9,23 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+// import Fab from '@material-ui/core/Fab';
+// import AddIcon from '@material-ui/icons/Add';
+import DownArrow from '@material-ui/icons/ArrowDownward';
 import Modal from '@material-ui/core/Modal';
 import InputBase from '@material-ui/core/InputBase';
-import Chip from '@material-ui/core/Chip';
+// import Chip from '@material-ui/core/Chip';
+import Button from '@material-ui/core/Button';
 
-import TagsInputField from './forms/TagsInputField';
-import CategorySelect from './forms/CategorySelect';
+// import TagsInputField from './forms/TagsInputField';
+// import CategorySelect from './forms/CategorySelect';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import OrganizationTable from './OrganizationTable';
 import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
 
 const FUSE_SEARCH_KEYS = [
     {
-        name: 'name'
+        name: 'Service_Name'
     }
 ]
 
@@ -39,8 +41,9 @@ const Search = (props) => {
     const [isModalOpen, setModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [resultsLimit, setResultsLimit] = useState(10);
     const [category, setCategory] = useState('');
-    const [tags, setTags] = useState([]);
+    const [tags, /*setTags*/] = useState([]);
 
     useEffect(() => {
         props.getOrganizations();
@@ -86,32 +89,32 @@ const Search = (props) => {
         return searchTerm.length ? filteredSearchResults : filteredOrgs;
     }
 
-    const addTag = (tagToAdd) => {
-        if (!tags.includes(tagToAdd)) {
-            const newTags = [ ...tags, tagToAdd ];
-            setTags(newTags);
-        }
-    }
+    // const addTag = (tagToAdd) => {
+    //     if (!tags.includes(tagToAdd)) {
+    //         const newTags = [ ...tags, tagToAdd ];
+    //         setTags(newTags);
+    //     }
+    // }
 
-    const removeTag = (tagToDelete) => {
-        if (tags.includes(tagToDelete)) {
-            const newTags = tags.filter(tag => tag !== tagToDelete);
-            setTags(newTags);
-        }
-    }
+    // const removeTag = (tagToDelete) => {
+    //     if (tags.includes(tagToDelete)) {
+    //         const newTags = tags.filter(tag => tag !== tagToDelete);
+    //         setTags(newTags);
+    //     }
+    // }
 
-    const renderTags = () => (
-        <div className={classes.chipContainer}>
-            {tags.map((tag, i) => (
-                <Chip
-                    label={tag}
-                    key={`${tag}-${i}`}
-                    onDelete={() => removeTag(tag)}
-                    className={classes.chip}
-                />
-            ))}
-        </div>
-    )
+    // const renderTags = () => (
+    //     <div className={classes.chipContainer}>
+    //         {tags.map((tag, i) => (
+    //             <Chip
+    //                 label={tag}
+    //                 key={`${tag}-${i}`}
+    //                 onDelete={() => removeTag(tag)}
+    //                 className={classes.chip}
+    //             />
+    //         ))}
+    //     </div>
+    // )
 
     const renderSearchField = () => (
         <Grid item xs={12}>
@@ -127,47 +130,69 @@ const Search = (props) => {
         </Grid>
     )
 
-    const renderCategoryFilter = () => (
-        <CategorySelect 
-            isFilter
-            selectedCategory={category} 
-            setSelectedCategory={(e) => setCategory(e.target.value)}
-        />
-    )
+    // const renderCategoryFilter = () => (
+    //     <CategorySelect 
+    //         isFilter
+    //         selectedCategory={category} 
+    //         setSelectedCategory={(e) => setCategory(e.target.value)}
+    //     />
+    // )
 
-    const renderTagFilter = () => (
-        <TagsInputField 
-            isFilter
-            tags={tags} 
-            addTag={addTag} 
-        />
-    )
+    // const renderTagFilter = () => (
+    //     <TagsInputField 
+    //         isFilter
+    //         tags={tags} 
+    //         addTag={addTag} 
+    //     />
+    // )
 
-    const renderMainContent = () => (
-        <Container className={classes.root} maxWidth="sm">
-            <Typography component="div">
-                {renderSearchField()}
-                <Grid item xs={12}>
-                    <div className={classes.filtersContainer}>
-                        {renderTagFilter()}
-                        {renderCategoryFilter()}
-                    </div>
-                    {renderTags()}
-                </Grid>
-                <OrganizationTable orgs={getFilteredOrgs()} />
-            </Typography>
-        </Container>
-    )
+    const renderMainContent = () => {
+        const filteredOrgs = getFilteredOrgs();
+        filteredOrgs.sort((a, b) => a.Service_Name > b.Service_Name ? 1 : -1)
 
-    const renderCreateOrgFab = () => (
-        <Fab
-            color="primary"
-            className={classes.fab}
-            onClick={() => setModal(true)}
-        >
-            <AddIcon />
-        </Fab>
-    )
+        return (
+            <Container className={classes.root} maxWidth="sm">
+                <Typography component="div">
+                    {renderSearchField()}
+                    {/* <Grid item xs={12}>
+                        <div className={classes.filtersContainer}>
+                            {renderTagFilter()}
+                            {renderCategoryFilter()}
+                        </div>
+                        {renderTags()}
+                    </Grid> */}
+                    <OrganizationTable 
+                        orgs={filteredOrgs} 
+                        resultsLimit={resultsLimit} 
+                        orgsLoaded={props.orgsLoaded}
+                    />
+                    {resultsLimit < filteredOrgs.length &&
+                        <div className={classes.backButtonContainer}>
+                            <Button 
+                                size="small" 
+                                variant="outlined"
+                                className={classes.backButton}
+                                onClick={() => setResultsLimit(resultsLimit + 10)}
+                            >
+                                <DownArrow className={classes.downArrowIcon} />
+                                Show more
+                            </Button>
+                        </div>
+                    }
+                </Typography>
+            </Container>
+        );
+    }
+
+    // const renderCreateOrgFab = () => (
+    //     <Fab
+    //         color="primary"
+    //         className={classes.fab}
+    //         onClick={() => setModal(true)}
+    //     >
+    //         <AddIcon />
+    //     </Fab>
+    // )
 
     const renderCreateOrgModal = () => (
         <Modal
@@ -190,7 +215,7 @@ const Search = (props) => {
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {renderCreateOrgFab()}
+            {/* {renderCreateOrgFab()} */}
             {renderCreateOrgModal()}
         </Fragment>
     )
@@ -241,6 +266,16 @@ const useStyles = makeStyles(theme => ({
         overflow: 'auto',
         margin: 'auto'
     },
+    backButtonContainer: {
+        margin: 'auto',
+        width: 'max-content'
+    },
+    backButton: {
+        margin: `${theme.spacing(2)}px 0`
+    },
+    downArrowIcon: {
+        marginRight: theme.spacing(0.5)
+    }
 }));
 
 Search.propTypes = {
@@ -260,6 +295,7 @@ const mapStateToProps = (state) => {
         organizations: state.organization.allOrgs.data,
         createdOrg: state.organization.createdOrg.data,
         orgsLoaded: state.organization.allOrgs.status === 'SUCCESS',
+        orgsLoading: state.organization.allOrgs.status === 'LOADING',
         orgIsCreated: state.organization.createdOrg.status === 'SUCCESS',
         orgIsDeleted: state.organization.deletedOrg.status === 'SUCCESS'
     }

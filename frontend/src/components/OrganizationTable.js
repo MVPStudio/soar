@@ -12,6 +12,8 @@ import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import Chip from '@material-ui/core/Chip';
 
+import LoadingDots from '../utils/LoadingDots';
+
 const useStyles = makeStyles(theme => ({
     root: {
         width: '100%',
@@ -20,15 +22,57 @@ const useStyles = makeStyles(theme => ({
     },
     italic: {
         fontStyle: 'italic'
+    },
+    loadingDotsContainer: {
+        display: 'flex',
+        justifyContent: 'flex-end',
     }
 }));
 
 const OrganizationTable = (props) => {
     const classes = useStyles();
 
-    const rows = props.orgs.map(org => (
-        { name: org.name, category: org.category, id: org._id }
+    const rows = props.orgs.slice(0, props.resultsLimit).map(org => (
+        { name: org.Service_Name, category: org.category, id: org._id }
     ))
+
+    const renderResults = () => {
+        if (!props.orgsLoaded) {
+            return (
+                <TableRow>
+                    <div className={classes.loadingDotsContainer}>
+                        <LoadingDots />
+                    </div>
+                </TableRow>
+            )
+        }
+
+        return (
+            rows.length ? rows.map(row => (
+                <TableRow key={row.name}>
+                    <TableCell align="left">
+                        <Link
+                            component={RouterLink}
+                            to={`/org/${row.id}`}
+                        >
+                            <Typography>{row.name}</Typography>
+                        </Link>
+                    </TableCell>
+                    <TableCell align="right">
+                        <Chip size="small" label={row.category} variant="outlined" />
+                    </TableCell>
+                </TableRow>
+            )) : (
+                <TableRow>
+                    <TableCell align="left">
+                        <Typography className={classes.italic}>
+                            No results match your search terms
+                        </Typography>
+                    </TableCell>
+                </TableRow>
+            )
+        )
+    }
 
     return (
         <Paper className={classes.root}>
@@ -40,29 +84,7 @@ const OrganizationTable = (props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.length ? rows.map(row => (
-                        <TableRow key={row.name}>
-                            <TableCell align="left">
-                                <Link
-                                    component={RouterLink}
-                                    to={`/org/${row.id}`}
-                                >
-                                    <Typography>{row.name}</Typography>
-                                </Link>
-                            </TableCell>
-                            <TableCell align="right">
-                                <Chip size="small" label={row.category} variant="outlined" />
-                            </TableCell>
-                        </TableRow>
-                    )) : (
-                        <TableRow>
-                            <TableCell align="left">
-                                <Typography className={classes.italic}>
-                                    No results match your search terms
-                                </Typography>
-                            </TableCell>
-                        </TableRow>
-                    )}
+                    {renderResults()}
                 </TableBody>
             </Table>
         </Paper>

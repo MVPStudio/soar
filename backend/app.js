@@ -7,7 +7,7 @@ const path = require('path');
 const users = require('./routes/user');
 const organizations = require('./routes/organization');
 
-const ecanDB = process.env.DATABASE_HOST || 'localhost:27017/soar';
+const ecanDB = process.env.DATABASE_HOST || 'localhost:27017/admin';
 const username = process.env.DATABASE_USERNAME;
 const password = process.env.DATABASE_PASSWORD;
 const hasAuth = username != null;

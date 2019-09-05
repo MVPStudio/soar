@@ -9,20 +9,21 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
-import Fab from '@material-ui/core/Fab';
+// import Fab from '@material-ui/core/Fab';
 import Modal from '@material-ui/core/Modal';
-import SvgIcon from '@material-ui/core/SvgIcon';
+// import SvgIcon from '@material-ui/core/SvgIcon';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Home, Phone, Link as LinkIcon, EmailOutlined } from '@material-ui/icons';
+import { Home, Phone, Link as LinkIcon, EmailOutlined, AvTimer, AccountCircle, Accessible } from '@material-ui/icons';
 import Badge from '@material-ui/core/Badge';
-import Chip from '@material-ui/core/Chip';
+// import Chip from '@material-ui/core/Chip';
 import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import BackIcon from '@material-ui/icons/KeyboardBackspace';
 
+import LoadingDots from '../utils/LoadingDots';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
 
@@ -66,13 +67,13 @@ const Organization = (props) => {
         <Container className={classes.root} maxWidth="sm">
             <StyledBadge badgeContent={props.organization.category} color="primary">
                 <Paper className={classes.paper}>
-                    <Typography variant="h5">{props.organization.name}</Typography>
+                    <Typography variant="h5">{props.organization.Service_Name}</Typography>
                     {
-                        props.organization.description !== '' &&
+                        props.organization.Description_of_Service !== '' &&
                         <Fragment>
                             <Divider className={classes.divider} />
-                            <Typography align="justify" className={classes.orgDescription}>
-                                {props.organization.description}
+                            <Typography align="left" className={classes.orgDescription}>
+                                {props.organization.Description_of_Service}
                             </Typography>
                         </Fragment>
                     }
@@ -81,7 +82,10 @@ const Organization = (props) => {
             <Paper className={classes.paper}>
                 <ContactInfo org={props.organization} />
             </Paper>
-            {
+            <Paper className={classes.paper}>
+                <ContactInfo useContact org={props.organization} />
+            </Paper>
+            {/* {
                 props.organization.tags &&
                 <Paper className={classes.paper}>
                     <Chip 
@@ -95,7 +99,7 @@ const Organization = (props) => {
                         ))
                     }
                 </Paper>
-            }
+            } */}
             <div className={classes.backButtonContainer}>
                 <Button variant="outlined" size="small" className={classes.backButton} component={RouterLink} to="/">
                     <BackIcon className={classes.backIcon} />
@@ -105,19 +109,19 @@ const Organization = (props) => {
         </Container>
     )
 
-    const renderEditOrgFab = () => (
-        <Fab
-            color="primary"
-            className={classes.fab}
-            onClick={() => setModal(true)}
-        >
-            <SvgIcon>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                </svg>
-            </SvgIcon>
-        </Fab>
-    )
+    // const renderEditOrgFab = () => (
+    //     <Fab
+    //         color="primary"
+    //         className={classes.fab}
+    //         onClick={() => setModal(true)}
+    //     >
+    //         <SvgIcon>
+    //             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    //                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+    //             </svg>
+    //         </SvgIcon>
+    //     </Fab>
+    // )
 
     const renderEditOrgModal = () => (
         <Modal
@@ -137,31 +141,100 @@ const Organization = (props) => {
         </Modal>
     )
 
-    return (
+    return props.isLoaded ? (
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {renderEditOrgFab()}
+            {/* {renderEditOrgFab()} */}
             {renderEditOrgModal()}
         </Fragment>
+    ) : (
+        <div className={classes.loadingDotsContainer}>
+            <LoadingDots />
+        </div>
     )
 }
 
-const ContactInfo = ({ org }) => {
+const ContactInfo = ({ org, useContact }) => {
     const classes = useStyles();
-    const { streetAddress, city, state, zipCode, phoneNumber, email, website } = org;
+
+    const { 
+        Physical_Site_Address_1: streetAddress, 
+        Physical_Site_City: city, 
+        Physical_Site_State: state, 
+        Physical_Site_Zip: zipCode, 
+        Contacts_First: contactName,
+        Contacts_Position: contactPosition,
+        Contacts_Phone: contactPhone,
+        Contacts_Email: contactEmail,
+        Main_Phone: phoneNumber, 
+        Fax: faxNumber, 
+        TDD_Phone: tddNumber, 
+        Emergency_After_Hours_Phone: emergencyNumber,
+        Hours_of_Operation: hours,
+        Service_Location_Email: email, 
+        Web_Address: website,
+        ADA_Access: adaAccess
+    } = org;
+
     const isEmpty = (string) => { return string === '' }
 
+    const atLeastOnePhoneNumberExists = !isEmpty(phoneNumber) || !isEmpty(faxNumber) || !isEmpty(tddNumber) || !isEmpty(emergencyNumber);
     const atLeastOneAddressValueExists = !isEmpty(streetAddress) || !isEmpty(city) || !isEmpty(state) || !isEmpty(zipCode);
-    const noAddressValuesExist = isEmpty(streetAddress) && isEmpty(city) && isEmpty(state) && isEmpty(zipCode);
-    const noValuesExist = noAddressValuesExist && isEmpty(phoneNumber) && isEmpty(email) && isEmpty(website);
+    const atLeastOneContactValueExists = !isEmpty(contactName) || !isEmpty(contactPosition) || !isEmpty(contactPhone) || !isEmpty(contactEmail);
+    const noValuesExist = !atLeastOneAddressValueExists && !atLeastOnePhoneNumberExists && isEmpty(email) && isEmpty(website);
 
-    if (noValuesExist) {
+    if (noValuesExist || (useContact && !atLeastOneContactValueExists)) {
         return (
             <List className={classes.listRoot}>
                 <Typography className={classes.italic}>
-                    No contact information yet
+                    {`No ${useContact && 'secondary'} contact information`}
                 </Typography>
+            </List>
+        )
+    }
+
+    if (useContact) {
+        return (
+            <List className={classes.listRoot}>
+                {
+                    !isEmpty(contactName) &&
+                    <Fragment>
+                        <ListItem>
+                            <ListItemIcon>
+                                <AccountCircle />
+                            </ListItemIcon>
+                            <ListItemText>
+                                <b>{contactName}</b>
+                                {!isEmpty(contactPosition) && <div>{contactPosition}</div>}
+                            </ListItemText>
+                        </ListItem>
+                        {(!isEmpty(contactPhone) || !isEmpty(contactEmail)) && <Divider />}
+                    </Fragment>
+                }
+                {
+                    !isEmpty(contactPhone) &&
+                    <Fragment>
+                        <ListItem>
+                            <ListItemIcon>
+                                <Phone />
+                            </ListItemIcon>
+                            <ListItemText>{contactPhone}</ListItemText>
+                        </ListItem>
+                        {!isEmpty(contactEmail) && <Divider />}
+                    </Fragment>
+                }
+                {
+                    !isEmpty(contactEmail) &&
+                    <Fragment>
+                        <ListItem>
+                            <ListItemIcon>
+                                <EmailOutlined />
+                            </ListItemIcon>
+                            <ListItemText>{contactEmail}</ListItemText>
+                        </ListItem>
+                    </Fragment>
+                }
             </List>
         )
     }
@@ -186,17 +259,46 @@ const ContactInfo = ({ org }) => {
                             </div>
                         </ListItemText>
                     </ListItem>
-                    {(!isEmpty(phoneNumber) || !isEmpty(website) || !isEmpty(email)) && <Divider />}
+                    {(atLeastOnePhoneNumberExists || !isEmpty(adaAccess) || !isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
                 </Fragment>
             }
             {
-                !isEmpty(phoneNumber) &&
+                atLeastOnePhoneNumberExists &&
                 <Fragment>
                     <ListItem>
                         <ListItemIcon>
                             <Phone />
                         </ListItemIcon>
-                        <ListItemText>{phoneNumber}</ListItemText>
+                        <ListItemText>
+                            {!isEmpty(phoneNumber) && <div><b>Main:</b> {phoneNumber}</div>}
+                            {!isEmpty(faxNumber) && <div><b>Fax:</b> {faxNumber}</div>}
+                            {!isEmpty(tddNumber) && <div><b>TDD:</b> {tddNumber}</div>}
+                            {!isEmpty(emergencyNumber) && <div><b>Emergency:</b> {emergencyNumber}</div>}
+                        </ListItemText>
+                    </ListItem>
+                    {(!isEmpty(adaAccess) || !isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
+                </Fragment>
+            }
+            {
+                !isEmpty(adaAccess) &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <Accessible />
+                        </ListItemIcon>
+                        <ListItemText>{adaAccess}</ListItemText>
+                    </ListItem>
+                    {(!isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
+                </Fragment>
+            }
+            {
+                !isEmpty(hours) &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <AvTimer />
+                        </ListItemIcon>
+                        <ListItemText>{hours}</ListItemText>
                     </ListItem>
                     {(!isEmpty(email) || !isEmpty(website)) && <Divider />}
                 </Fragment>
@@ -284,10 +386,14 @@ const useStyles = makeStyles(theme => ({
         width: 'max-content'
     },
     backButton: {
-        marginTop: theme.spacing(1)
+        margin: `${theme.spacing(1)}px 0 ${theme.spacing(2)}px 0`
     },
     backIcon: {
         marginRight: theme.spacing(0.5)
+    },
+    loadingDotsContainer: {
+        display: 'flex',
+        justifyContent: 'center',
     }
 }));
 
