@@ -148,18 +148,19 @@ const Search = (props) => {
 
     const renderMainContent = () => {
         const filteredOrgs = getFilteredOrgs();
+        filteredOrgs.sort((a, b) => a.Service_Name > b.Service_Name ? 1 : -1)
 
         return (
             <Container className={classes.root} maxWidth="sm">
                 <Typography component="div">
                     {renderSearchField()}
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <div className={classes.filtersContainer}>
                             {renderTagFilter()}
                             {renderCategoryFilter()}
                         </div>
                         {renderTags()}
-                    </Grid>
+                    </Grid> */}
                     <OrganizationTable 
                         orgs={filteredOrgs} 
                         resultsLimit={resultsLimit} 
@@ -214,7 +215,7 @@ const Search = (props) => {
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {renderCreateOrgFab()}
+            {/* {renderCreateOrgFab()} */}
             {renderCreateOrgModal()}
         </Fragment>
     )

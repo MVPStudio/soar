@@ -85,7 +85,7 @@ const Organization = (props) => {
             <Paper className={classes.paper}>
                 <ContactInfo useContact org={props.organization} />
             </Paper>
-            {
+            {/* {
                 props.organization.tags &&
                 <Paper className={classes.paper}>
                     <Chip 
@@ -99,7 +99,7 @@ const Organization = (props) => {
                         ))
                     }
                 </Paper>
-            }
+            } */}
             <div className={classes.backButtonContainer}>
                 <Button variant="outlined" size="small" className={classes.backButton} component={RouterLink} to="/">
                     <BackIcon className={classes.backIcon} />
@@ -145,7 +145,7 @@ const Organization = (props) => {
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {renderEditOrgFab()}
+            {/* {renderEditOrgFab()} */}
             {renderEditOrgModal()}
         </Fragment>
     ) : (
