@@ -16,13 +16,14 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Home, Phone, Link as LinkIcon, EmailOutlined, AvTimer, AccountCircle } from '@material-ui/icons';
+import { Home, Phone, Link as LinkIcon, EmailOutlined, AvTimer, AccountCircle, Accessible } from '@material-ui/icons';
 import Badge from '@material-ui/core/Badge';
 import Chip from '@material-ui/core/Chip';
 import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import BackIcon from '@material-ui/icons/KeyboardBackspace';
 
+import LoadingDots from '../utils/LoadingDots';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
 
@@ -140,13 +141,17 @@ const Organization = (props) => {
         </Modal>
     )
 
-    return (
+    return props.isLoaded ? (
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
             {renderEditOrgFab()}
             {renderEditOrgModal()}
         </Fragment>
+    ) : (
+        <div className={classes.loadingDotsContainer}>
+            <LoadingDots />
+        </div>
     )
 }
 
@@ -168,7 +173,8 @@ const ContactInfo = ({ org, useContact }) => {
         Emergency_After_Hours_Phone: emergencyNumber,
         Hours_of_Operation: hours,
         Service_Location_Email: email, 
-        Web_Address: website
+        Web_Address: website,
+        ADA_Access: adaAccess
     } = org;
 
     const isEmpty = (string) => { return string === '' }
@@ -253,7 +259,7 @@ const ContactInfo = ({ org, useContact }) => {
                             </div>
                         </ListItemText>
                     </ListItem>
-                    {(atLeastOnePhoneNumberExists || !isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
+                    {(atLeastOnePhoneNumberExists || !isEmpty(adaAccess) || !isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
                 </Fragment>
             }
             {
@@ -264,11 +270,23 @@ const ContactInfo = ({ org, useContact }) => {
                             <Phone />
                         </ListItemIcon>
                         <ListItemText>
-                            {!isEmpty(phoneNumber) && <div>{`Main: ${phoneNumber}`}</div>}
-                            {!isEmpty(faxNumber) && <div>{`Fax: ${faxNumber}`}</div>}
-                            {!isEmpty(tddNumber) && <div>{`TDD: ${tddNumber}`}</div>}
-                            {!isEmpty(emergencyNumber) && <div>{`Emergency: ${emergencyNumber}`}</div>}
+                            {!isEmpty(phoneNumber) && <div><b>Main:</b> {phoneNumber}</div>}
+                            {!isEmpty(faxNumber) && <div><b>Fax:</b> {faxNumber}</div>}
+                            {!isEmpty(tddNumber) && <div><b>TDD:</b> {tddNumber}</div>}
+                            {!isEmpty(emergencyNumber) && <div><b>Emergency:</b> {emergencyNumber}</div>}
                         </ListItemText>
+                    </ListItem>
+                    {(!isEmpty(adaAccess) || !isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
+                </Fragment>
+            }
+            {
+                !isEmpty(adaAccess) &&
+                <Fragment>
+                    <ListItem>
+                        <ListItemIcon>
+                            <Accessible />
+                        </ListItemIcon>
+                        <ListItemText>{adaAccess}</ListItemText>
                     </ListItem>
                     {(!isEmpty(hours) || !isEmpty(email) || !isEmpty(website)) && <Divider />}
                 </Fragment>
@@ -368,10 +386,14 @@ const useStyles = makeStyles(theme => ({
         width: 'max-content'
     },
     backButton: {
-        marginTop: theme.spacing(1)
+        margin: `${theme.spacing(1)}px 0 ${theme.spacing(2)}px 0`
     },
     backIcon: {
         marginRight: theme.spacing(0.5)
+    },
+    loadingDotsContainer: {
+        display: 'flex',
+        justifyContent: 'center',
     }
 }));
 

@@ -11,9 +11,11 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import DownArrow from '@material-ui/icons/ArrowDownward';
 import Modal from '@material-ui/core/Modal';
 import InputBase from '@material-ui/core/InputBase';
 import Chip from '@material-ui/core/Chip';
+import Button from '@material-ui/core/Button';
 
 import TagsInputField from './forms/TagsInputField';
 import CategorySelect from './forms/CategorySelect';
@@ -39,6 +41,7 @@ const Search = (props) => {
     const [isModalOpen, setModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [resultsLimit, setResultsLimit] = useState(10);
     const [category, setCategory] = useState('');
     const [tags, setTags] = useState([]);
 
@@ -143,21 +146,42 @@ const Search = (props) => {
         />
     )
 
-    const renderMainContent = () => (
-        <Container className={classes.root} maxWidth="sm">
-            <Typography component="div">
-                {renderSearchField()}
-                <Grid item xs={12}>
-                    <div className={classes.filtersContainer}>
-                        {renderTagFilter()}
-                        {renderCategoryFilter()}
-                    </div>
-                    {renderTags()}
-                </Grid>
-                <OrganizationTable orgs={getFilteredOrgs()} />
-            </Typography>
-        </Container>
-    )
+    const renderMainContent = () => {
+        const filteredOrgs = getFilteredOrgs();
+
+        return (
+            <Container className={classes.root} maxWidth="sm">
+                <Typography component="div">
+                    {renderSearchField()}
+                    <Grid item xs={12}>
+                        <div className={classes.filtersContainer}>
+                            {renderTagFilter()}
+                            {renderCategoryFilter()}
+                        </div>
+                        {renderTags()}
+                    </Grid>
+                    <OrganizationTable 
+                        orgs={filteredOrgs} 
+                        resultsLimit={resultsLimit} 
+                        orgsLoaded={props.orgsLoaded}
+                    />
+                    {resultsLimit < filteredOrgs.length &&
+                        <div className={classes.backButtonContainer}>
+                            <Button 
+                                size="small" 
+                                variant="outlined"
+                                className={classes.backButton}
+                                onClick={() => setResultsLimit(resultsLimit + 10)}
+                            >
+                                <DownArrow className={classes.downArrowIcon} />
+                                Show more
+                            </Button>
+                        </div>
+                    }
+                </Typography>
+            </Container>
+        );
+    }
 
     const renderCreateOrgFab = () => (
         <Fab
@@ -241,6 +265,16 @@ const useStyles = makeStyles(theme => ({
         overflow: 'auto',
         margin: 'auto'
     },
+    backButtonContainer: {
+        margin: 'auto',
+        width: 'max-content'
+    },
+    backButton: {
+        margin: `${theme.spacing(2)}px 0`
+    },
+    downArrowIcon: {
+        marginRight: theme.spacing(0.5)
+    }
 }));
 
 Search.propTypes = {
@@ -260,6 +294,7 @@ const mapStateToProps = (state) => {
         organizations: state.organization.allOrgs.data,
         createdOrg: state.organization.createdOrg.data,
         orgsLoaded: state.organization.allOrgs.status === 'SUCCESS',
+        orgsLoading: state.organization.allOrgs.status === 'LOADING',
         orgIsCreated: state.organization.createdOrg.status === 'SUCCESS',
         orgIsDeleted: state.organization.deletedOrg.status === 'SUCCESS'
     }
