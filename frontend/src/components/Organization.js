@@ -9,16 +9,16 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
-import Fab from '@material-ui/core/Fab';
+// import Fab from '@material-ui/core/Fab';
 import Modal from '@material-ui/core/Modal';
-import SvgIcon from '@material-ui/core/SvgIcon';
+// import SvgIcon from '@material-ui/core/SvgIcon';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Home, Phone, Link as LinkIcon, EmailOutlined, AvTimer, AccountCircle, Accessible } from '@material-ui/icons';
 import Badge from '@material-ui/core/Badge';
-import Chip from '@material-ui/core/Chip';
+// import Chip from '@material-ui/core/Chip';
 import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import BackIcon from '@material-ui/icons/KeyboardBackspace';
@@ -109,19 +109,19 @@ const Organization = (props) => {
         </Container>
     )
 
-    const renderEditOrgFab = () => (
-        <Fab
-            color="primary"
-            className={classes.fab}
-            onClick={() => setModal(true)}
-        >
-            <SvgIcon>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                </svg>
-            </SvgIcon>
-        </Fab>
-    )
+    // const renderEditOrgFab = () => (
+    //     <Fab
+    //         color="primary"
+    //         className={classes.fab}
+    //         onClick={() => setModal(true)}
+    //     >
+    //         <SvgIcon>
+    //             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    //                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+    //             </svg>
+    //         </SvgIcon>
+    //     </Fab>
+    // )
 
     const renderEditOrgModal = () => (
         <Modal

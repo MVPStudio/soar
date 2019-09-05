@@ -9,16 +9,16 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+// import Fab from '@material-ui/core/Fab';
+// import AddIcon from '@material-ui/icons/Add';
 import DownArrow from '@material-ui/icons/ArrowDownward';
 import Modal from '@material-ui/core/Modal';
 import InputBase from '@material-ui/core/InputBase';
-import Chip from '@material-ui/core/Chip';
+// import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
 
-import TagsInputField from './forms/TagsInputField';
-import CategorySelect from './forms/CategorySelect';
+// import TagsInputField from './forms/TagsInputField';
+// import CategorySelect from './forms/CategorySelect';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import OrganizationTable from './OrganizationTable';
 import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
@@ -43,7 +43,7 @@ const Search = (props) => {
     const [searchResults, setSearchResults] = useState([]);
     const [resultsLimit, setResultsLimit] = useState(10);
     const [category, setCategory] = useState('');
-    const [tags, setTags] = useState([]);
+    const [tags, /*setTags*/] = useState([]);
 
     useEffect(() => {
         props.getOrganizations();
@@ -89,32 +89,32 @@ const Search = (props) => {
         return searchTerm.length ? filteredSearchResults : filteredOrgs;
     }
 
-    const addTag = (tagToAdd) => {
-        if (!tags.includes(tagToAdd)) {
-            const newTags = [ ...tags, tagToAdd ];
-            setTags(newTags);
-        }
-    }
+    // const addTag = (tagToAdd) => {
+    //     if (!tags.includes(tagToAdd)) {
+    //         const newTags = [ ...tags, tagToAdd ];
+    //         setTags(newTags);
+    //     }
+    // }
 
-    const removeTag = (tagToDelete) => {
-        if (tags.includes(tagToDelete)) {
-            const newTags = tags.filter(tag => tag !== tagToDelete);
-            setTags(newTags);
-        }
-    }
+    // const removeTag = (tagToDelete) => {
+    //     if (tags.includes(tagToDelete)) {
+    //         const newTags = tags.filter(tag => tag !== tagToDelete);
+    //         setTags(newTags);
+    //     }
+    // }
 
-    const renderTags = () => (
-        <div className={classes.chipContainer}>
-            {tags.map((tag, i) => (
-                <Chip
-                    label={tag}
-                    key={`${tag}-${i}`}
-                    onDelete={() => removeTag(tag)}
-                    className={classes.chip}
-                />
-            ))}
-        </div>
-    )
+    // const renderTags = () => (
+    //     <div className={classes.chipContainer}>
+    //         {tags.map((tag, i) => (
+    //             <Chip
+    //                 label={tag}
+    //                 key={`${tag}-${i}`}
+    //                 onDelete={() => removeTag(tag)}
+    //                 className={classes.chip}
+    //             />
+    //         ))}
+    //     </div>
+    // )
 
     const renderSearchField = () => (
         <Grid item xs={12}>
@@ -130,21 +130,21 @@ const Search = (props) => {
         </Grid>
     )
 
-    const renderCategoryFilter = () => (
-        <CategorySelect 
-            isFilter
-            selectedCategory={category} 
-            setSelectedCategory={(e) => setCategory(e.target.value)}
-        />
-    )
+    // const renderCategoryFilter = () => (
+    //     <CategorySelect 
+    //         isFilter
+    //         selectedCategory={category} 
+    //         setSelectedCategory={(e) => setCategory(e.target.value)}
+    //     />
+    // )
 
-    const renderTagFilter = () => (
-        <TagsInputField 
-            isFilter
-            tags={tags} 
-            addTag={addTag} 
-        />
-    )
+    // const renderTagFilter = () => (
+    //     <TagsInputField 
+    //         isFilter
+    //         tags={tags} 
+    //         addTag={addTag} 
+    //     />
+    // )
 
     const renderMainContent = () => {
         const filteredOrgs = getFilteredOrgs();
@@ -184,15 +184,15 @@ const Search = (props) => {
         );
     }
 
-    const renderCreateOrgFab = () => (
-        <Fab
-            color="primary"
-            className={classes.fab}
-            onClick={() => setModal(true)}
-        >
-            <AddIcon />
-        </Fab>
-    )
+    // const renderCreateOrgFab = () => (
+    //     <Fab
+    //         color="primary"
+    //         className={classes.fab}
+    //         onClick={() => setModal(true)}
+    //     >
+    //         <AddIcon />
+    //     </Fab>
+    // )
 
     const renderCreateOrgModal = () => (
         <Modal
