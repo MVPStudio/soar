@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import MenuItem from '@material-ui/core/MenuItem';
+// import MenuItem from '@material-ui/core/MenuItem';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -20,22 +20,18 @@ import Container from '@material-ui/core/Container';
 
 import TagsInputField from './TagsInputField';
 import DeleteOrgDialog from './DeleteOrgDialog';
-import CategorySelect from './CategorySelect';
+// import CategorySelect from './CategorySelect';
 import { getOrganizations, createOrganization, editOrganization, deleteOrganization } from '../../redux/actions/organization';
-import { states } from './FormValues';
+// import { states } from './FormValues';
 
 const emptyState = {
-    name: '',
-    category: undefined,
-    description: '',
-    tags: [],
-    email: '',
-    phoneNumber: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    website: ''
+    Name: '',
+    Description: '',
+    Actions: [],
+    Email: '',
+    Phone: '',
+    Address: '',
+    Website: ''
 }
 
 const CreateEditOrgForm = (props) => {
@@ -43,17 +39,14 @@ const CreateEditOrgForm = (props) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const [isDeleteModalOpen, setDeleteModal] = useState(false);
     const [values, setValues] = useState(!props.editing ? emptyState : {
-        name: props.selectedOrg.name,
-        category: props.selectedOrg.category,
-        description: props.selectedOrg.description,
-        tags: props.selectedOrg.tags,
-        email: props.selectedOrg.email,
-        phoneNumber: props.selectedOrg.phoneNumber,
-        streetAddress: props.selectedOrg.streetAddress,
-        city: props.selectedOrg.city,
-        state: props.selectedOrg.state,
-        zipCode: props.selectedOrg.zipCode,
-        website: props.selectedOrg.website
+        Name: props.selectedOrg.Name,
+        Description: props.selectedOrg.Description,
+        Actions: props.selectedOrg.Actions,
+        Email: props.selectedOrg.Email,
+        Phone: props.selectedOrg.Phone,
+        Address: props.selectedOrg.Address,
+        Website: props.selectedOrg.Website,
+        Contact: props.selectedOrg.Contact,
     });
 
     useEffect(() => {
@@ -68,8 +61,8 @@ const CreateEditOrgForm = (props) => {
         }
     }, [props.orgIsDeleted]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const handleChange = name => e => {
-        setValues({ ...values, [name]: e.target.value });
+    const handleChange = Name => e => {
+        setValues({ ...values, [Name]: e.target.value });
     }
 
     const handleSelectedTabChange = (event, newValue) => {
@@ -83,30 +76,30 @@ const CreateEditOrgForm = (props) => {
     }
 
     const addTag = (tagToAdd) => {
-        if (!values.tags.includes(tagToAdd)) {
-            const newTags = [ ...values.tags, tagToAdd ];
-            setValues({ ...values, tags: newTags });
+        if (!values.Actions.includes(tagToAdd)) {
+            const newActions = [ ...values.Actions, tagToAdd ];
+            setValues({ ...values, Actions: newActions });
         }
     }
 
     const removeTag = (tagToDelete) => {
-        if (values.tags.includes(tagToDelete)) {
-            const newTags = values.tags.filter(tag => tag !== tagToDelete);
-            setValues({ ...values, tags: newTags });
+        if (values.Actions.includes(tagToDelete)) {
+            const newActions = values.Actions.filter(tag => tag !== tagToDelete);
+            setValues({ ...values, Actions: newActions });
         }
     }
 
     const handleCreateOrEdit = () => {
         if (props.editing) {
-            props.editOrganization(props.selectedOrg._id, { ...values });
+            props.editOrganization(props.selectedOrg._id, { ...values, Actions: values.Actions });
         } else {
-            props.createOrganization({ ...values });
+            props.createOrganization({ ...values, Actions: values.Actions });
         }
     }
 
-    const renderTags = () => (
+    const renderActions = () => (
         <div className={classes.chipContainer}>
-            {values.tags.map((tag, i) => (
+            {values.Actions.map((tag, i) => (
                 <Chip
                     label={tag}
                     key={`${tag}-${i}`}
@@ -122,19 +115,15 @@ const CreateEditOrgForm = (props) => {
             <TextField
                 label="Name"
                 className={classes.textField}
-                value={values.name}
-                onChange={handleChange('name')}
+                value={values.Name}
+                onChange={handleChange('Name')}
                 margin="normal"
                 variant="outlined"
                 required
             />
-            <CategorySelect 
-                selectedCategory={values.category || ''} 
-                setSelectedCategory={handleChange('category')}
-            />
             <div>
-                <TagsInputField tags={values.tags} addTag={addTag} />
-                {renderTags()}
+                <TagsInputField tags={values.Actions} addTag={addTag} />
+                {renderActions()}
             </div>
         </Fragment>
     )
@@ -144,65 +133,40 @@ const CreateEditOrgForm = (props) => {
             <TextField
                 label="Street Address"
                 className={classes.textField}
-                value={values.streetAddress}
-                onChange={handleChange('streetAddress')}
+                value={values.Address}
+                onChange={handleChange('Address')}
                 margin="normal"
                 variant="outlined"
             />
-            <div className={classes.textFieldContainer}>
-                <TextField
-                    label="City"
-                    className={classes.city}
-                    value={values.city}
-                    onChange={handleChange('city')}
-                    margin="normal"
-                    variant="outlined"
-                />
-                <TextField
-                    select
-                    label="State"
-                    className={classes.state}
-                    value={values.state}
-                    onChange={handleChange('state')}
-                    margin="normal"
-                    variant="outlined"
-                >
-                    {states.map((state, i) => (
-                        <MenuItem key={`${state}-${i}`} value={state}>
-                            {state}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <TextField
-                    label="Zip Code"
-                    className={classes.zipCode}
-                    value={values.zipCode}
-                    onChange={handleChange('zipCode')}
-                    margin="normal"
-                    variant="outlined"
-                />
-            </div>
             <TextField
                 label="Phone Number"
                 className={classes.textField}
-                value={values.phoneNumber}
-                onChange={handleChange('phoneNumber')}
-                margin="normal"
-                variant="outlined"
-            />
-            <TextField
-                label="Email"
-                className={classes.textField}
-                value={values.email}
-                onChange={handleChange('email')}
+                value={values.Phone}
+                onChange={handleChange('Phone')}
                 margin="normal"
                 variant="outlined"
             />
             <TextField
                 label="Website or Social Media Link"
                 className={classes.textField}
-                value={values.website}
-                onChange={handleChange('website')}
+                value={values.Website}
+                onChange={handleChange('Website')}
+                margin="normal"
+                variant="outlined"
+            />
+            <TextField
+                label="Contact Name"
+                className={classes.textField}
+                value={values.Contact}
+                onChange={handleChange('Email')}
+                margin="normal"
+                variant="outlined"
+            />
+            <TextField
+                label="Contact Email"
+                className={classes.textField}
+                value={values.Email}
+                onChange={handleChange('Email')}
                 margin="normal"
                 variant="outlined"
             />
@@ -215,8 +179,8 @@ const CreateEditOrgForm = (props) => {
                 multiline
                 label="About the Organization"
                 className={classes.textField}
-                value={values.description}
-                onChange={handleChange('description')}
+                value={values.Description}
+                onChange={handleChange('Description')}
                 margin="normal"
                 variant="outlined"
                 rows="10"

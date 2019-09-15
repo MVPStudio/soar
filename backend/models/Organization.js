@@ -4,47 +4,35 @@ mongoose.set('useFindAndModify', false);
 const Schema = mongoose.Schema;
 
 const OrganizationSchema = new Schema({
-    name: {
+    Name: {
         type: String,
         required: true
     },
-    category: {
-        type: String,
-        default: 'Other'
-    },
-    description: {
+    Description: {
         type: String,
         default: ''
     },
-    tags: {
+    Actions: {
         type: Array,
         default: []
     },
-    phoneNumber: {
+    Phone: {
         type: String,
         default: ''
     },
-    email: {
+    Email: {
         type: String,
         default: ''
     },
-    website: {
+    Contact: {
         type: String,
         default: ''
     },
-    streetAddress: {
+    Website: {
         type: String,
         default: ''
     },
-    city: {
-        type: String,
-        default: ''
-    },
-    state: {
-        type: String,
-        default: ''
-    },
-    zipCode: {
+    Address: {
         type: String,
         default: ''
     }

@@ -10,7 +10,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
-import Chip from '@material-ui/core/Chip';
 
 import LoadingDots from '../utils/LoadingDots';
 
@@ -25,7 +24,7 @@ const useStyles = makeStyles(theme => ({
     },
     loadingDotsContainer: {
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
     }
 }));
 
@@ -33,7 +32,7 @@ const OrganizationTable = (props) => {
     const classes = useStyles();
 
     const rows = props.orgs.slice(0, props.resultsLimit).map(org => (
-        { name: org.Service_Name, category: org.category, id: org._id }
+        { name: org.Name, id: org._id }
     ))
 
     const renderResults = () => {
@@ -58,9 +57,6 @@ const OrganizationTable = (props) => {
                             <Typography>{row.name}</Typography>
                         </Link>
                     </TableCell>
-                    <TableCell align="right">
-                        <Chip size="small" label={row.category} variant="outlined" />
-                    </TableCell>
                 </TableRow>
             )) : (
                 <TableRow>
@@ -80,7 +76,6 @@ const OrganizationTable = (props) => {
                 <TableHead>
                     <TableRow>
                         <TableCell component="th" align="left">Organization</TableCell>
-                        <TableCell component="th" align="right">Category</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
