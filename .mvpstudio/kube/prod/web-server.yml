@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecan-soar-web
+  namespace: prod-ecan-soar
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind: Mapping
+      name: prod-ecan-soar-mapping
+      host: soar.prod.apps.mvpstudio.org
+      prefix: /
+      service: ecan-soar-web.prod-ecan-soar
+      ---
+      apiVersion: ambassador/v0
+      kind: TLSContext
+      name: prod-ecan-soar-tls
+      hosts:
+      - soar.prod.apps.mvpstudio.org
+      secret: prod-apps-cert
+spec:
+  selector:
+    app: ecan-soar
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-ecan-soar-deployment
+  namespace: prod-ecan-soar
+  labels:
+    app: ecan-soar
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecan-soar
+  template:
+    metadata:
+      labels:
+        app: ecan-soar
+    spec:
+      containers:
+        - name: web-server
+          image: mvpstudio/ecan-soar:aa75140
+          resources:
+            limits:
+              cpu: .5
+              memory: 500Mi
+            requests:
+              cpu: 0.25
+              memory: 250Mi
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            - name: NODE_ENV
+              value: production
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt
+                  key: secretKey
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ecan-soar-mongo-credentials
+                  key: password
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ecan-soar-mongo-credentials
+                  key: username
+            - name: DATABASE_HOST
+              value: ecan-soar-mongodb/admin
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1

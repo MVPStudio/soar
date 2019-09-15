@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod-ecan-soar
+---
+kind: ResourceQuota
+apiVersion: v1
+metadata:
+  name: prod-ecan-soar-quota
+  namespace: prod-ecan-soar
+spec:
+  hard:
+    requests.cpu: 1
+    requests.memory: 2Gi
+    limits.cpu: 2
+    limits.memory: 3Gi
