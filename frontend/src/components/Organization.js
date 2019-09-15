@@ -25,6 +25,7 @@ import BackIcon from '@material-ui/icons/KeyboardBackspace';
 import LoadingDots from '../utils/LoadingDots';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
+import { isAdmin } from '../utils/getUrlQuery.js';
 
 const Organization = (props) => {
     const classes = useStyles();
@@ -86,7 +87,7 @@ const Organization = (props) => {
                 </Paper>
             }
             <div className={classes.backButtonContainer}>
-                <Button variant="outlined" size="small" className={classes.backButton} component={RouterLink} to="/">
+                <Button size="small" className={classes.backButton} component={RouterLink} to="/">
                     <BackIcon className={classes.backIcon} />
                     Back to search
                 </Button>
@@ -130,7 +131,7 @@ const Organization = (props) => {
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {renderEditOrgFab()}
+            {isAdmin() === true && renderEditOrgFab()}
             {renderEditOrgModal()}
         </Fragment>
     ) : (
@@ -253,7 +254,8 @@ const ContactInfo = ({ org, useContact }) => {
 
 const useStyles = makeStyles(theme => ({
     root: {
-        marginTop: theme.spacing(4)
+        marginTop: theme.spacing(4),
+        marginBottom: theme.spacing(4)
     },
     fab: {
         position: 'fixed',
@@ -299,7 +301,8 @@ const useStyles = makeStyles(theme => ({
         width: 'max-content'
     },
     backButton: {
-        margin: `${theme.spacing(1)}px 0 ${theme.spacing(2)}px 0`
+        margin: `${theme.spacing(1)}px 0 ${theme.spacing(2)}px 0`,
+        color: 'rgba(0, 0, 0, 0.54)'
     },
     backIcon: {
         marginRight: theme.spacing(0.5)
