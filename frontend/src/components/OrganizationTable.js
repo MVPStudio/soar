@@ -8,8 +8,10 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
+import Chip from '@material-ui/core/Chip';
 
 import LoadingDots from '../utils/LoadingDots';
 
@@ -25,14 +27,29 @@ const useStyles = makeStyles(theme => ({
     loadingDotsContainer: {
         display: 'flex',
         justifyContent: 'center',
-    }
+    },
+    orgName: {
+        fontSize: '1.15rem',
+        marginBottom: '0.5rem'
+    },
+    actionChip: {
+        marginRight: '0.25rem',
+        marginBottom: '0.25rem'
+    },
+    flexContainer: {
+        display: 'flex',
+        flexFlow: 'row wrap'
+    },
+    divider: {
+        marginBottom: theme.spacing(2)
+    },
 }));
 
 const OrganizationTable = (props) => {
     const classes = useStyles();
 
     const rows = props.orgs.slice(0, props.resultsLimit).map(org => (
-        { name: org.Name, id: org._id }
+        { name: org.Name, id: org._id, actions: org.Actions }
     ))
 
     const renderResults = () => {
@@ -54,8 +71,20 @@ const OrganizationTable = (props) => {
                             component={RouterLink}
                             to={`/org/${row.id}`}
                         >
-                            <Typography>{row.name}</Typography>
+                            <Typography className={classes.orgName}>{row.name}</Typography>
                         </Link>
+                        {row.actions.length && <Divider className={classes.divider} />}
+                        <div className={classes.flexContainer}>
+                            <Chip 
+                                size="small"
+                                label="Actions:"
+                                className={classes.actionChip}
+                                variant="outlined" 
+                            />
+                            {row.actions.map((action, i) => {
+                                return <Chip key={`${action}-${i}`} size="small" className={classes.actionChip} label={action} />
+                            })}
+                        </div>
                     </TableCell>
                 </TableRow>
             )) : (
@@ -75,7 +104,7 @@ const OrganizationTable = (props) => {
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell component="th" align="left">Organization</TableCell>
+                        <TableCell component="th" align="left">Organizations</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

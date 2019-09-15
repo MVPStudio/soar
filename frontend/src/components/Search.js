@@ -14,18 +14,24 @@ import AddIcon from '@material-ui/icons/Add';
 import DownArrow from '@material-ui/icons/ArrowDownward';
 import Modal from '@material-ui/core/Modal';
 import InputBase from '@material-ui/core/InputBase';
-import Chip from '@material-ui/core/Chip';
+// import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
 
-import TagsInputField from './forms/TagsInputField';
+// import TagsInputField from './forms/TagsInputField';
 // import CategorySelect from './forms/CategorySelect';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import OrganizationTable from './OrganizationTable';
 import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
+import { isAdmin } from '../utils/getUrlQuery.js';
 
 const FUSE_SEARCH_KEYS = [
     {
-        name: 'Name'
+        name: 'Name',
+        weight: 0.7
+    },
+    {
+        name: 'Actions',
+        weight: 0.3
     }
 ]
 
@@ -43,7 +49,7 @@ const Search = (props) => {
     const [searchResults, setSearchResults] = useState([]);
     const [resultsLimit, setResultsLimit] = useState(10);
     const [category, setCategory] = useState('');
-    const [tags, setTags] = useState([]);
+    const [tags, /*setTags*/] = useState([]);
 
     useEffect(() => {
         props.getOrganizations();
@@ -89,32 +95,32 @@ const Search = (props) => {
         return searchTerm.length ? filteredSearchResults : filteredOrgs;
     }
 
-    const addTag = (tagToAdd) => {
-        if (!tags.includes(tagToAdd)) {
-            const newTags = [ ...tags, tagToAdd ];
-            setTags(newTags);
-        }
-    }
+    // const addTag = (tagToAdd) => {
+    //     if (!tags.includes(tagToAdd)) {
+    //         const newTags = [ ...tags, tagToAdd ];
+    //         setTags(newTags);
+    //     }
+    // }
 
-    const removeTag = (tagToDelete) => {
-        if (tags.includes(tagToDelete)) {
-            const newTags = tags.filter(tag => tag !== tagToDelete);
-            setTags(newTags);
-        }
-    }
+    // const removeTag = (tagToDelete) => {
+    //     if (tags.includes(tagToDelete)) {
+    //         const newTags = tags.filter(tag => tag !== tagToDelete);
+    //         setTags(newTags);
+    //     }
+    // }
 
-    const renderTags = () => (
-        <div className={classes.chipContainer}>
-            {tags.map((tag, i) => (
-                <Chip
-                    label={tag}
-                    key={`${tag}-${i}`}
-                    onDelete={() => removeTag(tag)}
-                    className={classes.chip}
-                />
-            ))}
-        </div>
-    )
+    // const renderTags = () => (
+    //     <div className={classes.chipContainer}>
+    //         {tags.map((tag, i) => (
+    //             <Chip
+    //                 label={tag}
+    //                 key={`${tag}-${i}`}
+    //                 onDelete={() => removeTag(tag)}
+    //                 className={classes.chip}
+    //             />
+    //         ))}
+    //     </div>
+    // )
 
     const renderSearchField = () => (
         <Grid item xs={12}>
@@ -122,7 +128,7 @@ const Search = (props) => {
                 <InputBase
                     fullWidth
                     type="search"
-                    placeholder="Search organizations..."
+                    placeholder="Search organizations or actions..."
                     onChange={(e) => setSearchTerm(e.target.value)}
                     value={searchTerm}
                 />
@@ -138,29 +144,29 @@ const Search = (props) => {
     //     />
     // )
 
-    const renderTagFilter = () => (
-        <TagsInputField 
-            isFilter
-            tags={tags} 
-            addTag={addTag} 
-        />
-    )
+    // const renderTagFilter = () => (
+    //     <TagsInputField 
+    //         isFilter
+    //         tags={tags} 
+    //         addTag={addTag} 
+    //     />
+    // )
 
     const renderMainContent = () => {
         const filteredOrgs = getFilteredOrgs();
-        filteredOrgs.sort((a, b) => a.Service_Name > b.Service_Name ? 1 : -1)
+        filteredOrgs.sort((a, b) => a.Name > b.Name ? 1 : -1)
 
         return (
             <Container className={classes.root} maxWidth="sm">
                 <Typography component="div">
                     {renderSearchField()}
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <div className={classes.filtersContainer}>
                             {renderTagFilter()}
-                            {/* {renderCategoryFilter()} */}
+                            {renderCategoryFilter()}
                         </div>
                         {renderTags()}
-                    </Grid>
+                    </Grid> */}
                     <OrganizationTable 
                         orgs={filteredOrgs} 
                         resultsLimit={resultsLimit} 
@@ -170,7 +176,6 @@ const Search = (props) => {
                         <div className={classes.backButtonContainer}>
                             <Button 
                                 size="small" 
-                                variant="outlined"
                                 className={classes.backButton}
                                 onClick={() => setResultsLimit(resultsLimit + 10)}
                             >
@@ -215,7 +220,7 @@ const Search = (props) => {
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {renderCreateOrgFab()}
+            {isAdmin() === true && renderCreateOrgFab()}
             {renderCreateOrgModal()}
         </Fragment>
     )
@@ -224,6 +229,7 @@ const Search = (props) => {
 const useStyles = makeStyles(theme => ({
     root: {
         marginTop: theme.spacing(4),
+        marginBottom: theme.spacing(4)
     },
     orgLink: {
         width: '100%',
@@ -271,7 +277,8 @@ const useStyles = makeStyles(theme => ({
         width: 'max-content'
     },
     backButton: {
-        margin: `${theme.spacing(2)}px 0`
+        margin: `${theme.spacing(2)}px 0`,
+        color: 'rgba(0, 0, 0, 0.54)'
     },
     downArrowIcon: {
         marginRight: theme.spacing(0.5)
