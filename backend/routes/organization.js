@@ -14,17 +14,15 @@ router.get('/:id', (req, res) => {
 })
 
 router.post('/create', (req, res) => {
-    Organization.findOne({ name: req.body.name })
+    Organization.findOne({ Name: req.body.Name })
         .then(org => {
             if (org) {
                 return res.status(409).json({
-                    name: 'Organization with this name already exists'
+                    Name: 'Organization with this name already exists'
                 });
             } else {
-                const newOrg = new Organization({
-                    ...req.body
-                })
-
+                const newOrg = new Organization({ ...req.body })
+                
                 newOrg.save()
                     .then(org => res.status(201).json(org))
                     .catch(err => res.status(400).json(err))

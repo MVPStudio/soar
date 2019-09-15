@@ -14,7 +14,7 @@ const DeleteOrgDialog = (props) => {
             <Divider className={classes.divider} />
             <Typography component="div">
                 <div className={classes.deleteAreYouSure}>
-                    {`Are you sure you want to delete ${props.selectedOrg.name}?`}
+                    {`Are you sure you want to delete ${props.selectedOrg.Name}?`}
                 </div>
                 <b>This cannot be undone.</b>
             </Typography>
