@@ -20,9 +20,15 @@ import Button from '@material-ui/core/Button';
 // import TagsInputField from './forms/TagsInputField';
 // import CategorySelect from './forms/CategorySelect';
 import CreateEditOrgForm from './forms/CreateEditOrg';
-import OrganizationTable from './OrganizationTable';
-import { getOrganizations, createOrganization, resetDeleteOrganization } from '../redux/actions/organization';
-import { isAdmin } from '../utils/getUrlQuery.js';
+// import OrganizationTable from './OrganizationTable';
+import OrganizationCards from './OrganizationCards';
+import { 
+    getOrganizations, 
+    createOrganization, 
+    resetDeleteOrganization,
+    resetGetOrganizations
+} from '../redux/actions/organization';
+import { getIsAdmin, getUrlSearchTerm } from '../utils/urlParams.js';
 
 const FUSE_SEARCH_KEYS = [
     {
@@ -51,8 +57,16 @@ const Search = (props) => {
     const [category, setCategory] = useState('');
     const [tags, /*setTags*/] = useState([]);
 
+    const isAdmin = getIsAdmin(props.history.location);
+    const urlSearchTerm = getUrlSearchTerm(props.history.location);
+
     useEffect(() => {
         props.getOrganizations();
+        
+        return () => {
+            setSearchTerm('')
+            props.resetGetOrganizations()
+        }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
@@ -61,6 +75,12 @@ const Search = (props) => {
 
         setSearchResults(results)
     }, [searchTerm]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (props.orgsAreFetched) {
+            setSearchTerm(urlSearchTerm)
+        }
+    }, [props.orgsAreFetched]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // When the CreateEditOrgForm redirects here after a delete, reset deletedOrg prop
     useEffect(() => {
@@ -167,7 +187,7 @@ const Search = (props) => {
                         </div>
                         {renderTags()}
                     </Grid> */}
-                    <OrganizationTable 
+                    <OrganizationCards 
                         orgs={filteredOrgs} 
                         resultsLimit={resultsLimit} 
                         orgsLoaded={props.orgsLoaded}
@@ -220,7 +240,7 @@ const Search = (props) => {
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {isAdmin() === true && renderCreateOrgFab()}
+            {isAdmin === true && renderCreateOrgFab()}
             {renderCreateOrgModal()}
         </Fragment>
     )
@@ -277,7 +297,7 @@ const useStyles = makeStyles(theme => ({
         width: 'max-content'
     },
     backButton: {
-        margin: `${theme.spacing(2)}px 0`,
+        margin: `${theme.spacing(1)}px 0 ${theme.spacing(2)}px 0`,
         color: 'rgba(0, 0, 0, 0.54)'
     },
     downArrowIcon: {
@@ -300,6 +320,7 @@ Search.defaultProps = {
 const mapStateToProps = (state) => {
     return {
         organizations: state.organization.allOrgs.data,
+        orgsAreFetched: state.organization.allOrgs.status === 'SUCCESS',
         createdOrg: state.organization.createdOrg.data,
         orgsLoaded: state.organization.allOrgs.status === 'SUCCESS',
         orgsLoading: state.organization.allOrgs.status === 'LOADING',
@@ -311,7 +332,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     getOrganizations,
     createOrganization,
-    resetDeleteOrganization
+    resetDeleteOrganization,
+    resetGetOrganizations
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Search)

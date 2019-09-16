@@ -1,5 +1,5 @@
 import { 
-    GET_ORGS_LOADING, GET_ORGS_SUCCESS, GET_ORGS_FAILURE,
+    GET_ORGS_LOADING, GET_ORGS_SUCCESS, GET_ORGS_FAILURE, GET_ORGS_RESET,
     GET_ORG_LOADING, GET_ORG_SUCCESS, GET_ORG_FAILURE,
     CREATE_ORG_LOADING, CREATE_ORG_SUCCESS, CREATE_ORG_FAILURE, CREATE_ORG_RESET,
     EDIT_ORG_LOADING, EDIT_ORG_SUCCESS, EDIT_ORG_FAILURE, EDIT_ORG_RESET,
@@ -35,10 +35,7 @@ export default (state = initialState, action) => {
         case GET_ORGS_LOADING:
             return {
                 ...state,
-                allOrgs: {
-                    data: [],
-                    status: 'LOADING'
-                }
+                allOrgs: initialState.allOrgs
             }
         case GET_ORGS_SUCCESS:
             return {
@@ -49,6 +46,15 @@ export default (state = initialState, action) => {
                 }
             }
         case GET_ORGS_FAILURE:
+            return {
+                ...state,
+                allOrgs: {
+                    data: [],
+                    error: payload,
+                    status: 'FAILURE'
+                }
+            }
+        case GET_ORGS_RESET:
             return {
                 ...state,
                 allOrgs: {

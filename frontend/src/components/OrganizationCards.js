@@ -3,13 +3,11 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import Card from '@material-ui/core/Card';
+// import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
 import Divider from '@material-ui/core/Divider';
-import Paper from '@material-ui/core/Paper';
+// import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import Chip from '@material-ui/core/Chip';
 
@@ -43,37 +41,38 @@ const useStyles = makeStyles(theme => ({
     divider: {
         marginBottom: theme.spacing(2)
     },
+    card: {
+        marginBottom: theme.spacing(2)
+    }
 }));
 
-const OrganizationTable = (props) => {
+const OrganizationCards = (props) => {
     const classes = useStyles();
 
-    const rows = props.orgs.slice(0, props.resultsLimit).map(org => (
+    const cards = props.orgs.slice(0, props.resultsLimit).map(org => (
         { name: org.Name, id: org._id, actions: org.Actions }
     ))
 
     const renderResults = () => {
         if (!props.orgsLoaded) {
             return (
-                <TableRow>
-                    <div className={classes.loadingDotsContainer}>
-                        <LoadingDots />
-                    </div>
-                </TableRow>
+                <div className={classes.loadingDotsContainer}>
+                    <LoadingDots />
+                </div>
             )
         }
 
         return (
-            rows.length ? rows.map(row => (
-                <TableRow key={row.name}>
-                    <TableCell align="left">
+            cards.length ? cards.map(card => (
+                <Card className={classes.card}>
+                    <CardContent>
                         <Link
                             component={RouterLink}
-                            to={`/org/${row.id}`}
+                            to={`/org/${card.id}`}
                         >
-                            <Typography className={classes.orgName}>{row.name}</Typography>
+                            <Typography className={classes.orgName}>{card.name}</Typography>
                         </Link>
-                        {row.actions.length && <Divider className={classes.divider} />}
+                        {card.actions.length && <Divider className={classes.divider} />}
                         <div className={classes.flexContainer}>
                             <Chip 
                                 size="small"
@@ -81,7 +80,7 @@ const OrganizationTable = (props) => {
                                 className={classes.actionChip}
                                 variant="outlined"
                             />
-                            {row.actions.map((action, i) => {
+                            {card.actions.map((action, i) => {
                                 return (
                                     <Chip 
                                         key={`${action}-${i}`} 
@@ -95,34 +94,19 @@ const OrganizationTable = (props) => {
                                 )
                             })}
                         </div>
-                    </TableCell>
-                </TableRow>
+                    </CardContent>
+                </Card>
             )) : (
-                <TableRow>
-                    <TableCell align="left">
-                        <Typography className={classes.italic}>
-                            No results match your search terms
-                        </Typography>
-                    </TableCell>
-                </TableRow>
+                <Card>
+                    <Typography className={classes.italic}>
+                        No results match your search terms
+                    </Typography>
+                </Card>
             )
         )
     }
 
-    return (
-        <Paper className={classes.root}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell component="th" align="left">Organizations</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {renderResults()}
-                </TableBody>
-            </Table>
-        </Paper>
-    );
+    return renderResults();
 }
 
-export default OrganizationTable;
+export default OrganizationCards;
