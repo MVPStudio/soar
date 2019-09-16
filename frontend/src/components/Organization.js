@@ -25,11 +25,13 @@ import BackIcon from '@material-ui/icons/KeyboardBackspace';
 import LoadingDots from '../utils/LoadingDots';
 import CreateEditOrgForm from './forms/CreateEditOrg';
 import { getOrganization, resetCreateOrganization, resetEditOrganization } from '../redux/actions/organization';
-import { isAdmin } from '../utils/getUrlQuery.js';
+import { getIsAdmin } from '../utils/urlParams.js';
 
 const Organization = (props) => {
     const classes = useStyles();
     const [isModalOpen, setModal] = useState(false);
+
+    const isAdmin = getIsAdmin(props.history.location);
 
     useEffect(() => {
         const orgId = window.location.pathname.replace('/org/', '');
@@ -81,7 +83,14 @@ const Organization = (props) => {
                     />
                     {
                         props.organization.Actions.map((tag, i) => (
-                            <Chip key={`${tag}-${i}`} label={tag} className={classes.chip} />
+                            <Chip 
+                                clickable 
+                                key={`${tag}-${i}`} 
+                                label={tag} 
+                                className={classes.chip} 
+                                component={RouterLink}
+                                to={`/?${tag}`}
+                            />
                         ))
                     }
                 </Paper>
@@ -131,7 +140,7 @@ const Organization = (props) => {
         <Fragment>
             <CssBaseline />
             {renderMainContent()}
-            {isAdmin() === true && renderEditOrgFab()}
+            {isAdmin === true && renderEditOrgFab()}
             {renderEditOrgModal()}
         </Fragment>
     ) : (
@@ -269,6 +278,7 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary,
+        overflow: 'auto'
     },
     modalContainer: {
         position: 'absolute',

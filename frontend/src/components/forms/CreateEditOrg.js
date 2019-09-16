@@ -131,7 +131,7 @@ const CreateEditOrgForm = (props) => {
     const renderContactInfo = () => (
         <Fragment>
             <TextField
-                label="Street Address"
+                label="Address"
                 className={classes.textField}
                 value={values.Address}
                 onChange={handleChange('Address')}
@@ -147,7 +147,7 @@ const CreateEditOrgForm = (props) => {
                 variant="outlined"
             />
             <TextField
-                label="Website or Social Media Link"
+                label="Website"
                 className={classes.textField}
                 value={values.Website}
                 onChange={handleChange('Website')}
@@ -357,12 +357,14 @@ CreateEditOrgForm.propTypes = {
 }
 
 const mapStateToProps = (state) => {
+    const org = state.organization;
+    
     return {
-        createdOrg: state.organization.createdOrg.data,
-        selectedOrg: state.organization.selectedOrg.data,
-        orgIsCreated: state.organization.createdOrg.status === 'SUCCESS',
-        orgIsEdited: state.organization.editedOrg.status === 'SUCCESS',
-        orgIsDeleted: state.organization.deletedOrg.status === 'SUCCESS'
+        createdOrg: org.createdOrg.data,
+        selectedOrg: org.selectedOrg.data,
+        orgIsCreated: org.createdOrg.status === 'SUCCESS',
+        orgIsEdited: org.editedOrg.status === 'SUCCESS',
+        orgIsDeleted: org.deletedOrg.status === 'SUCCESS'
     }
 }
 
