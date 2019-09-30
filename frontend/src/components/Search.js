@@ -164,7 +164,15 @@ const Search = (props) => {
                 </Typography>
                 <br />
                 <Typography>
-                    SOAR is an acronym for <span style={{ color: '#4CAF50', fontWeight: 'bold' }}>Stretching Our Actionable Reach</span>. 
+                    SOAR is an acronym for&nbsp;
+                    <a 
+                        href="https://sites.google.com/site/emeraldcompassionateaction/soar" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        style={{ fontWeight: 'bold', color: '#4CAF50', textDecoration: 'none' }}
+                    >
+                        Stretching Our Actionable Reach
+                    </a>. 
                     This first iteration is the foundation for what will eventually be a tool for building 
                     collaborative projects among service organizations and recruiting volunteers for those 
                     projects.
