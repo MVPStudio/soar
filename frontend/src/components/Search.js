@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { array, bool, object } from 'prop-types';
 import Fuse from 'fuse.js';
+import get from 'lodash/get';
 
 import { makeStyles  } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -16,6 +17,11 @@ import Modal from '@material-ui/core/Modal';
 import InputBase from '@material-ui/core/InputBase';
 // import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Divider from '@material-ui/core/Divider';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 // import TagsInputField from './forms/TagsInputField';
 // import CategorySelect from './forms/CategorySelect';
@@ -28,7 +34,7 @@ import {
     resetDeleteOrganization,
     resetGetOrganizations
 } from '../redux/actions/organization';
-import { getIsAdmin, getUrlSearchTerm } from '../utils/urlParams.js';
+import { getIsAdmin } from '../utils/urlParams.js';
 
 const FUSE_SEARCH_KEYS = [
     {
@@ -58,7 +64,7 @@ const Search = (props) => {
     const [tags, /*setTags*/] = useState([]);
 
     const isAdmin = getIsAdmin(props.history.location);
-    const urlSearchTerm = getUrlSearchTerm(props.history.location);
+    const urlSearchTerm = get(props, 'history.location.state.searchTerm', '');
 
     useEffect(() => {
         props.getOrganizations();
@@ -77,8 +83,11 @@ const Search = (props) => {
     }, [searchTerm]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
+        const scrollY = get(props, 'history.location.state.scrollY', 0);
+
         if (props.orgsAreFetched) {
             setSearchTerm(urlSearchTerm)
+            window.scroll(0, scrollY)
         }
     }, [props.orgsAreFetched]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -142,15 +151,44 @@ const Search = (props) => {
     //     </div>
     // )
 
+    const renderSiteDescription = () => (
+        <ExpansionPanel className={classes.infoDropdown}>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography className={classes.infoHeading}>What is SOAR?</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails className={classes.infoDetailsWrapper}>
+                <Typography>
+                    You are invited to visit and critique this experimental, searchable directory 
+                    of congregations that have programs to alleviate the conditions of poverty. 
+                    Please send questions or feedback to innercom@peak.org.
+                </Typography>
+                <br />
+                <Typography>
+                    SOAR is an acronym for <span style={{ color: '#4CAF50', fontWeight: 'bold' }}>Stretching Our Actionable Reach</span>. 
+                    This first iteration is the foundation for what will eventually be a tool for building 
+                    collaborative projects among service organizations and recruiting volunteers for those 
+                    projects.
+                </Typography>
+                <br />
+                <Typography>
+                Additional sectors of our community, including business, government, NGOs 
+                    and advocacy organizations, will be added at a later date, along with specific projects 
+                    and their measurable outcomes.
+                </Typography>
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+    )
+
     const renderSearchField = () => (
         <Grid item xs={12}>
             <Paper className={classes.paper}>
                 <InputBase
                     fullWidth
                     type="search"
-                    placeholder="Search organizations or actions..."
+                    placeholder="🔎 Search organizations or actions..."
                     onChange={(e) => setSearchTerm(e.target.value)}
                     value={searchTerm}
+                    // style={{ fontStyle: 'italic' }}
                 />
             </Paper>
         </Grid>
@@ -179,6 +217,8 @@ const Search = (props) => {
         return (
             <Container className={classes.root} maxWidth="sm">
                 <Typography component="div">
+                    {renderSiteDescription()}
+                    <Divider className={classes.divider} />
                     {renderSearchField()}
                     {/* <Grid item xs={12}>
                         <div className={classes.filtersContainer}>
@@ -191,6 +231,7 @@ const Search = (props) => {
                         orgs={filteredOrgs} 
                         resultsLimit={resultsLimit} 
                         orgsLoaded={props.orgsLoaded}
+                        searchTerm={searchTerm}
                     />
                     {resultsLimit < filteredOrgs.length &&
                         <div className={classes.backButtonContainer}>
@@ -302,7 +343,17 @@ const useStyles = makeStyles(theme => ({
     },
     downArrowIcon: {
         marginRight: theme.spacing(0.5)
-    }
+    },
+    infoDropdown: {
+        borderRadius: '4px',
+        backgroundColor: 'rgba(0, 0, 0, .03)'
+    },
+    infoHeading: {
+    },
+    infoDetailsWrapper: {
+        flexDirection: 'column',
+        fontStyle: 'italic'
+    },
 }));
 
 Search.propTypes = {

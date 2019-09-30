@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { object, bool } from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
+import get from 'lodash/get';
 
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -53,56 +54,75 @@ const Organization = (props) => {
         }
     }, [props.orgIsEdited]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const renderMainContent = () => (
-        <Container className={classes.root} maxWidth="sm">
-            <Paper className={classes.paper}>
-                <Typography variant="h5">{props.organization.Name}</Typography>
-                {
-                    props.organization.Description !== '' &&
-                    <Fragment>
-                        <Divider className={classes.divider} />
-                        <Typography align="left" className={classes.orgDescription}>
-                            {props.organization.Description}
-                        </Typography>
-                    </Fragment>
-                }
-            </Paper>
-            <Paper className={classes.paper}>
-                <ContactInfo org={props.organization} />
-            </Paper>
-            <Paper className={classes.paper}>
-                <ContactInfo useContact org={props.organization} />
-            </Paper>
-            {
-                props.organization.Actions &&
+    const renderMainContent = () => {
+        const searchTerm = get(props, 'history.location.state.searchTerm', '');
+        const scrollY = get(props, 'history.location.state.scrollY', 0);
+        
+        return (
+            <Container className={classes.root} maxWidth="sm">
                 <Paper className={classes.paper}>
-                    <Chip 
-                        label={props.organization.Actions.length ? 'Actions:' : 'No actions yet'} 
-                        className={classes.chip} 
-                        variant="outlined" 
-                    />
+                    <Typography variant="h5">{props.organization.Name}</Typography>
                     {
-                        props.organization.Actions.map((tag, i) => (
-                            <Chip 
-                                clickable 
-                                key={`${tag}-${i}`} 
-                                label={tag} 
-                                className={classes.chip} 
-                                component={RouterLink}
-                                to={`/?${tag}`}
-                            />
-                        ))
+                        props.organization.Description !== '' &&
+                        <Fragment>
+                            <Divider className={classes.divider} />
+                            <Typography align="left" className={classes.orgDescription}>
+                                {props.organization.Description}
+                            </Typography>
+                        </Fragment>
                     }
                 </Paper>
-            }
-            <div className={classes.backButtonContainer}>
-                <Button size="small" className={classes.backButton} component={RouterLink} to="/">
-                    <BackIcon className={classes.backIcon} />
-                    Back to search
-                </Button>
-            </div>
-        </Container>
-    )
+                <Paper className={classes.paper}>
+                    <ContactInfo org={props.organization} />
+                </Paper>
+                <Paper className={classes.paper}>
+                    <ContactInfo useContact org={props.organization} />
+                </Paper>
+                {
+                    props.organization.Actions &&
+                    <Paper className={classes.paper}>
+                        <Chip 
+                            label={props.organization.Actions.length ? 'Actions:' : 'No actions yet'} 
+                            className={classes.chip} 
+                            variant="outlined" 
+                        />
+                        {
+                            props.organization.Actions.map((tag, i) => (
+                                <Chip 
+                                    clickable 
+                                    key={`${tag}-${i}`} 
+                                    label={tag} 
+                                    className={classes.chip} 
+                                    component={RouterLink}
+                                    to={{ 
+                                        pathname: '/',
+                                        state: { searchTerm: tag.trim() }
+                                    }}
+                                />
+                            ))
+                        }
+                    </Paper>
+                }
+                <div className={classes.backButtonContainer}>
+                    <Button 
+                        size="small" 
+                        className={classes.backButton} 
+                        component={RouterLink} 
+                        to={{ 
+                            pathname: '/',
+                            state: { 
+                                scrollY,
+                                searchTerm
+                            }
+                        }}
+                    >
+                        <BackIcon className={classes.backIcon} />
+                        Back to search
+                    </Button>
+                </div>
+            </Container>
+        );
+    }
 
     const renderEditOrgFab = () => (
         <Fab

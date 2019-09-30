@@ -64,11 +64,17 @@ const OrganizationCards = (props) => {
 
         return (
             cards.length ? cards.map(card => (
-                <Card className={classes.card}>
+                <Card className={classes.card} key={card.id}>
                     <CardContent>
                         <Link
                             component={RouterLink}
-                            to={`/org/${card.id}`}
+                            to={{
+                                pathname: `/org/${card.id}`,
+                                state: { 
+                                    searchTerm: props.searchTerm,
+                                    scrollY: window.scrollY
+                                }
+                            }}
                         >
                             <Typography className={classes.orgName}>{card.name}</Typography>
                         </Link>
@@ -87,9 +93,12 @@ const OrganizationCards = (props) => {
                                         size="small" 
                                         className={classes.actionChip} 
                                         label={action} 
-                                        // clickable
-                                        // component={RouterLink}
-                                        // to={`/?${action}`}
+                                        clickable
+                                        component={RouterLink}
+                                        to={{ 
+                                            pathname: '/',
+                                            state: { searchTerm: action.trim() }
+                                        }}
                                     />
                                 )
                             })}
@@ -99,7 +108,7 @@ const OrganizationCards = (props) => {
             )) : (
                 <Card>
                     <Typography className={classes.italic}>
-                        No results match your search terms
+                        <CardContent>No results match your search terms</CardContent>
                     </Typography>
                 </Card>
             )
